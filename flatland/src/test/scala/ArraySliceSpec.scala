@@ -6,7 +6,7 @@ import org.scalatest._
 
 class ArraySliceSpec extends FreeSpec with MustMatchers {
 
-  "sliceInt" - {
+  "ArraySliceInt" - {
     "empty" in {
       val slice = new ArraySliceInt(Array(), 0, 0)
       slice.isEmpty mustEqual true

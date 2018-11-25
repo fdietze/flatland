@@ -13,7 +13,10 @@ final class ArrayStackInt private (private val data:Array[Int]) extends AnyVal {
   @inline private def incrementTop(): Unit = data(0) += 1
   @inline private def decrementTop(): Unit = data(0) -= 1
 
+  @inline def size = top-1
   @inline def isEmpty = top == 1
+  @inline def isFull = top == data.length
+
   @inline def push(value:Int) = {
     data(top) = value
     incrementTop()
