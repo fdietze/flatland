@@ -80,6 +80,13 @@ package object flatland {
       None
     }
 
+    @inline def findIdxByIdx(p:Int => Boolean):Option[Int] = {
+      array.foreachIndex{ i =>
+        if(p(i)) return Some(i)
+      }
+      None
+    }
+
     @inline def filterIdxToArraySet(p: Int => Boolean):(ArraySet,Int) = {
       val set = ArraySet.create(array.length)
       var i = 0

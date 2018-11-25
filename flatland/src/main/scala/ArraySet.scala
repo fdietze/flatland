@@ -28,6 +28,16 @@ object ArraySet {
     }
   }
 
+  @inline def foreachIndexAndElement(f:(Int, Int) => Unit):Unit = {
+    var index = 0
+    marked.foreachIndex{ i =>
+      if(contains(i)) {
+        f(index, i)
+        index += 1
+      }
+    }
+  }
+
   @inline def calculateIsEmpty:Boolean = {
     foreach{_ => return false}
     true
