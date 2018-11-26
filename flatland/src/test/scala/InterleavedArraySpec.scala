@@ -6,9 +6,9 @@ import org.scalatest._
 
 class InterleavedArraySpec extends FreeSpec with MustMatchers {
 
-  "InterleavedArrayInt" - {
+  "InterleavedArray" - {
     "one interleaved tuple (a,b)" in {
-      val interleaved = InterleavedArrayInt.create(1)
+      val interleaved = InterleavedArray.create[Int](1)
       interleaved.updatea(0,5)
       interleaved.updateb(0,7)
 
@@ -17,7 +17,7 @@ class InterleavedArraySpec extends FreeSpec with MustMatchers {
     }
 
     "one interleaved tuple (x,y)" in {
-      val interleaved = InterleavedArrayInt.create(1)
+      val interleaved = InterleavedArray.create[Int](1)
       interleaved.updatex(0,5)
       interleaved.updatey(0,7)
 
@@ -26,7 +26,7 @@ class InterleavedArraySpec extends FreeSpec with MustMatchers {
     }
 
     "elementCount" in {
-      val interleaved = InterleavedArrayInt.create(17)
+      val interleaved = InterleavedArray.create[Int](17)
       interleaved.elementCount mustEqual 17
     }
   }

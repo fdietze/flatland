@@ -8,7 +8,7 @@ import scala.collection.mutable
 // data: contains all data of the virtual nested arrays
 // sliceArray: stores start/length of nested array interleaved
 
-final class NestedArrayInt(data: Array[Int], sliceArray: InterleavedArrayInt) extends IndexedSeq[ArraySliceInt] {
+final class NestedArrayInt(data: Array[Int], sliceArray: InterleavedArray[Int]) extends IndexedSeq[ArraySliceInt] {
   @inline def length: Int = sliceArray.elementCount
   @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
@@ -91,7 +91,7 @@ final class NestedArrayIntBuilder(nestedArray: NestedArrayInt){
 object NestedArrayInt {
   def apply(nested:Array[Array[Int]]): NestedArrayInt = {
     var currentStart = 0
-    val sliceArray = InterleavedArrayInt.create(nested.length)
+    val sliceArray = InterleavedArray.create[Int](nested.length)
     nested.foreachIndexAndElement { (i, slice) =>
       sliceArray.updatea(i,currentStart)
       sliceArray.updateb(i,slice.length)
@@ -110,7 +110,7 @@ object NestedArrayInt {
   }
 
   def apply(sliceLengths:Array[Int]):NestedArrayInt = {
-    val sliceArray = InterleavedArrayInt.create(sliceLengths.length)
+    val sliceArray = InterleavedArray.create[Int](sliceLengths.length)
     var currentStart = 0
     sliceLengths.foreachIndexAndElement{ (i,sliceLength) =>
       sliceArray.updatea(i, currentStart)
@@ -128,7 +128,7 @@ object NestedArrayInt {
   def apply(nested:Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
     // ArrayBuilders can also be null to represent an empty builder 
     var currentStart = 0
-    val sliceArray = InterleavedArrayInt.create(nested.length)
+    val sliceArray = InterleavedArray.create[Int](nested.length)
     val builtSlices = new Array[Array[Int]](nested.length)
 
     nested.foreachIndexAndElement{(i, sliceBuilder) =>

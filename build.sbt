@@ -10,7 +10,7 @@ lazy val flatland = (crossProject.crossType(CrossType.Pure))
       Nil
     ),
 
-  scalaJSStage in Test := FullOptStage,
+  scalaJSStage in Test := FastOptStage, // not fullopt, because exceptions are removed by optimizations
 
   initialCommands in console := """
   import flatland._
