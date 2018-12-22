@@ -2,6 +2,9 @@
 
 High-performance helpers for working with flat arrays in Scala.
 
+Be aware that `@inline class` is only optimized in ScalaJS.
+To know more about the JVM, you should read: https://developer.lightbend.com/blog/2018-11-01-the-scala-2.12-2.13-inliner-and-optimizer/index.html
+
 ## Dependency
 
 For Scala and ScalaJS:
