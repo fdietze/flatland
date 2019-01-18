@@ -17,6 +17,11 @@ object InterleavedArray {
   @inline def updatex(i:Int, value:T): Unit = updatea(i,value)
   @inline def updatey(i:Int, value:T): Unit = updateb(i,value)
 
+  @inline def left(i:Int): T = a(i)
+  @inline def right(i:Int): T = b(i)
+  @inline def updateLeft(i:Int, value:T): Unit = updatea(i,value)
+  @inline def updateRight(i:Int, value:T): Unit = updateb(i,value)
+
   @inline def elementCount:Int = interleaved.length / 2
 
   @inline def foreachTwoElements(f: (T,T) => Unit): Unit = {
