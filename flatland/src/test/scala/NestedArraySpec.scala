@@ -72,5 +72,11 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       nested.map(0)(_.toString).toList mustEqual List("7", "8", "9")
       nested.map(1)(identity).toList mustEqual List(1, 2, 3)
     }
+
+    "toArraySet" in {
+      val nested = NestedArrayInt(Array(Array(0, 1), Array(0)))
+      nested.toArraySet(0).collectAllElements.toList mustEqual List(0, 1)
+      nested.toArraySet(1).collectAllElements.toList mustEqual List(0)
+    }
   }
 }

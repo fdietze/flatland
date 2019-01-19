@@ -93,6 +93,13 @@ final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArra
     }
     result
   }
+
+  @inline def toArraySet(idx: Int):ArraySet = {
+    val arraySet = ArraySet.create(this.length)
+    foreachElement(idx)(arraySet.add)
+    arraySet
+  }
+
 }
 
 final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
