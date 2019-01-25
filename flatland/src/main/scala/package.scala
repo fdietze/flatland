@@ -131,6 +131,21 @@ package object flatland {
       }
     }
 
+    @inline def foreachIndex2Combination(f: (Int,Int) => Unit): Unit = {
+      val n = array.length
+      var i = 0
+      var j = 0
+
+      while(i < n) {
+        j = i
+        while( j < n ) {
+          if(i != j) f(i,j)
+          j += 1
+        }
+        i += 1
+      }
+    }
+
   }
 
   implicit final class RichIntArray(val array:Array[Int]) extends AnyVal {
