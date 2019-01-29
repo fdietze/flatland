@@ -111,13 +111,7 @@ package object flatland {
     }
 
     @inline def foreachIndex(f: Int => Unit): Unit = {
-      val n = array.length
-      var i = 0
-
-      while(i < n ) {
-        f(i)
-        i += 1
-      }
+      loop(array.length)(f)
     }
 
     @inline def foreachElement(f: T => Unit): Unit = {
