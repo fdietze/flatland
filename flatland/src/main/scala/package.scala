@@ -2,6 +2,15 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 
 package object flatland {
+  @inline def loop(n:Int, start:Int = 0)(f:Int => Unit):Unit = {
+    var i = start
+    while(i < n) {
+      f(i)
+      i += 1
+    }
+  }
+
+
   implicit final class RichIndexedSeq[T](val self:IndexedSeq[T]) extends AnyVal {
     @inline def minMax(smallerThan: (T, T) => Boolean): (T, T) = {
       if (self.isEmpty) throw new UnsupportedOperationException("minMax on empty sequence")
