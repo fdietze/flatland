@@ -4,6 +4,11 @@ import scala.reflect.ClassTag
 
 object InterleavedArray {
   @inline def create[T:ClassTag](n:Int): InterleavedArray[T] = new InterleavedArray[T](new Array[T](n*2))
+
+  implicit def toIndexdSeq[T](interleaved: InterleavedArray[T]): IndexedSeq[(T,T)] = new IndexedSeq[(T,T)] {
+    def apply(idx: Int): (T,T) = (interleaved.a(idx), interleaved.b(idx))
+    def length: Int = interleaved.elementCount
+  }
 }
 
 @inline final class InterleavedArray[@specialized(Int, Double, Boolean) T](val interleaved:Array[T]) {
