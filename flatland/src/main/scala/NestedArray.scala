@@ -53,6 +53,11 @@ import scala.reflect.ClassTag
       i += 1
     }
   }
+  @inline def foreachIndexAndSlice(f: (Int, ArraySliceInt) => Unit): Unit = {
+    loop(length) { i =>
+      f(i,apply(i))
+    }
+  }
   @inline def foreachSliceAndElement(idxArray: Array[Int])(f: Int => Unit): Unit = {
     // fast iteration over sub-array without allocation
     var j = 0
