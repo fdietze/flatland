@@ -100,6 +100,15 @@ final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArra
     arraySet
   }
 
+  def transposed:NestedArrayInt = {
+    val counts = new Array[Int](length)
+    data.foreachElement(counts(_) += 1)
+    val builder = NestedArrayInt.builder(counts)
+    loop(length) { i =>
+      foreachElement(i) { builder.add(_, i) }
+    }
+    builder.result()
+  }
 }
 
 final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
