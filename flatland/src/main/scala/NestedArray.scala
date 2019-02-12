@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 // data: contains all data of the virtual nested arrays
 // sliceArray: stores start/length of nested array interleaved
 
-final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArray[Int]) extends IndexedSeq[ArraySliceInt] {
+@inline final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArray[Int]) extends IndexedSeq[ArraySliceInt] {
   @inline def length: Int = sliceArray.elementCount
   @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
@@ -159,7 +159,7 @@ object NestedArrayInt {
     new NestedArrayInt(array, sliceArray)
   }
 
-  def builder(sliceLengths: Array[Int]): NestedArrayIntBuilder = {
+  @inline def builder(sliceLengths: Array[Int]): NestedArrayIntBuilder = {
     new NestedArrayIntBuilder(apply(sliceLengths)) //, sliceLengths)
   }
 
