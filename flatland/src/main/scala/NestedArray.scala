@@ -59,13 +59,7 @@ import scala.reflect.ClassTag
     }
   }
   @inline def foreachSliceAndElement(idxArray: Array[Int])(f: Int => Unit): Unit = {
-    // fast iteration over sub-array without allocation
-    var j = 0
-    val m = idxArray.length
-    while (j < m) {
-      foreachElement(idxArray(j))(f)
-      j += 1
-    }
+    idxArray.foreachElement { foreachElement(_)(f) } 
   }
   @inline def forall(idx: Int)(f: Int => Boolean): Boolean = {
     // fast iteration over sub-array without allocation
