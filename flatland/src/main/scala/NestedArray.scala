@@ -86,7 +86,7 @@ import scala.reflect.ClassTag
   @inline def flatMap[T](idx: Int)(f: Int => Array[T])(implicit classTag: ClassTag[T]): Array[T] = {
     val result = Array.newBuilder[T]
     // fast iteration over sub-array without allocation
-    foreachIndexAndElement(idx){ (i, elem) =>
+    foreachElement(idx){ elem =>
       result ++= f(elem)
     }
     result.result
