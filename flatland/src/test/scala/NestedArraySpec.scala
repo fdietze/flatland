@@ -79,6 +79,13 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       nested.flatMap(1)(i => Array(i, i + 1)).toList mustEqual List(1, 2, 2, 3, 3, 4)
     }
 
+    "count" in {
+      val nested = NestedArrayInt(Array(Array(1, 2, 3), Array(1, 2, 3, 4), Array(1)))
+      nested.count(0)(_ < 3) mustEqual 2
+      nested.count(1)(_ > 3) mustEqual 1
+      nested.count(2)(_ > 3) mustEqual 0
+    }
+
     "toArraySet" in {
       val nested = NestedArrayInt(Array(Array(0, 1), Array(0)))
       nested.toArraySet(0).collectAllElements.toList mustEqual List(0, 1)

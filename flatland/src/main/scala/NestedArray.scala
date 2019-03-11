@@ -83,6 +83,19 @@ import scala.reflect.ClassTag
   }
   @inline def contains(idx: Int)(elem: Int): Boolean = exists(idx)(_ == elem)
 
+
+  @inline def count[T](idx: Int)(f: Int => Boolean): Int = {
+    // fast iteration over sub-array without allocation
+    var i = 0
+    var counter = 0
+    val n = sliceLength(idx)
+    while (i < n) {
+      if (f(apply(idx, i))) counter += 1
+      i += 1
+    }
+    counter
+  }
+
   @inline def flatMap[T](idx: Int)(f: Int => Array[T])(implicit classTag: ClassTag[T]): Array[T] = {
     val result = Array.newBuilder[T]
     // fast iteration over sub-array without allocation
