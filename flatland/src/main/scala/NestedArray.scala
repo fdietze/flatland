@@ -83,6 +83,17 @@ import scala.reflect.ClassTag
   }
   @inline def contains(idx: Int)(elem: Int): Boolean = exists(idx)(_ == elem)
 
+  @inline def collectFirst[T](idx: Int)(f: PartialFunction[Int, T]): Option[T] = {
+    // fast iteration over sub-array without allocation
+    var i = 0
+    val n = sliceLength(idx)
+    val safef: PartialFunction[Int, Unit] = f.andThen { t => return Some(t) }
+    while (i < n) {
+      safef.applyOrElse(apply(idx, i), (_: Int) => ())
+      i += 1
+    }
+    None
+  }
 
   @inline def count[T](idx: Int)(f: Int => Boolean): Int = {
     // fast iteration over sub-array without allocation
@@ -113,6 +124,16 @@ import scala.reflect.ClassTag
       result(i) = f(elem)
     }
     result
+  }
+
+  @inline def collect[T](idx: Int)(f: PartialFunction[Int, T])(implicit classTag: ClassTag[T]): Array[T] = {
+    val result = Array.newBuilder[T]
+    // fast iteration over sub-array without allocation
+    val safef: PartialFunction[Int, Unit] = f.andThen { t => result += t }
+    foreachIndexAndElement(idx){ (i, elem) =>
+      safef.applyOrElse(elem, (_: Int) => ())
+    }
+    result.result
   }
 
   @inline def toArraySet(idx: Int):ArraySet = {
