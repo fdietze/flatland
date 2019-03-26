@@ -46,7 +46,7 @@ class InterleavedArrayDoubleSpec extends FreeSpec with MustMatchers {
       interleaved.updatex(1, 3.0)
       interleaved.updatey(1, 4.0)
 
-      interleaved.toList mustEqual List((5.0,7.0), (3.0,4.0))
+      interleaved.toList mustEqual List((5.0, 7.0), (3.0, 4.0))
     }
   }
 }

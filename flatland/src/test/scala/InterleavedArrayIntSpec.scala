@@ -46,7 +46,7 @@ class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
       interleaved.updatex(1, 3)
       interleaved.updatey(1, 4)
 
-      interleaved.toList mustEqual List((5,7), (3,4))
+      interleaved.toList mustEqual List((5, 7), (3, 4))
     }
   }
 }

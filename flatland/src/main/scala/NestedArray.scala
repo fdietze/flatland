@@ -55,11 +55,11 @@ import scala.reflect.ClassTag
   }
   @inline def foreachIndexAndSlice(f: (Int, ArraySliceInt) => Unit): Unit = {
     loop(length) { i =>
-      f(i,apply(i))
+      f(i, apply(i))
     }
   }
   @inline def foreachSliceAndElement(idxArray: Array[Int])(f: Int => Unit): Unit = {
-    idxArray.foreachElement { foreachElement(_)(f) } 
+    idxArray.foreachElement { foreachElement(_)(f) }
   }
   @inline def forall(idx: Int)(f: Int => Boolean): Boolean = {
     // fast iteration over sub-array without allocation
@@ -136,13 +136,13 @@ import scala.reflect.ClassTag
     result.result
   }
 
-  @inline def toArraySet(idx: Int):ArraySet = {
+  @inline def toArraySet(idx: Int): ArraySet = {
     val arraySet = ArraySet.create(this.length)
     foreachElement(idx)(arraySet.add)
     arraySet
   }
 
-  def transposed:NestedArrayInt = {
+  def transposed: NestedArrayInt = {
     val counts = new Array[Int](length)
     data.foreachElement(counts(_) += 1)
     val builder = NestedArrayInt.builder(counts)
