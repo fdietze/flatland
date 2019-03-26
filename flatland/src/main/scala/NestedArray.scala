@@ -9,7 +9,7 @@ import scala.reflect.ClassTag
 // data: contains all data of the virtual nested arrays
 // sliceArray: stores start/length of nested array interleaved
 
-@inline final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArray[Int]) extends IndexedSeq[ArraySliceInt] {
+@inline final class NestedArrayInt(val data: Array[Int], val sliceArray: InterleavedArrayInt) extends IndexedSeq[ArraySliceInt] {
   @inline def length: Int = sliceArray.elementCount
   @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
@@ -171,7 +171,7 @@ final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
 object NestedArrayInt {
   def apply(nested: Array[Array[Int]]): NestedArrayInt = {
     var currentStart = 0
-    val sliceArray = InterleavedArray.create[Int](nested.length)
+    val sliceArray = InterleavedArrayInt.create(nested.length)
     nested.foreachIndexAndElement { (i, slice) =>
       sliceArray.updatea(i, currentStart)
       sliceArray.updateb(i, slice.length)
@@ -190,7 +190,7 @@ object NestedArrayInt {
   }
 
   def apply(sliceLengths: Array[Int]): NestedArrayInt = {
-    val sliceArray = InterleavedArray.create[Int](sliceLengths.length)
+    val sliceArray = InterleavedArrayInt.create(sliceLengths.length)
     var currentStart = 0
     sliceLengths.foreachIndexAndElement{ (i, sliceLength) =>
       sliceArray.updatea(i, currentStart)
@@ -208,7 +208,7 @@ object NestedArrayInt {
   def apply(nested: Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
     // ArrayBuilders can also be null to represent an empty builder
     var currentStart = 0
-    val sliceArray = InterleavedArray.create[Int](nested.length)
+    val sliceArray = InterleavedArrayInt.create(nested.length)
     val builtSlices = new Array[Array[Int]](nested.length)
 
     nested.foreachIndexAndElement{ (i, sliceBuilder) =>
