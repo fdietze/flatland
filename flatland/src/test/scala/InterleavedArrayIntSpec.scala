@@ -4,7 +4,7 @@ import flatland._
 
 import org.scalatest._
 
-class InterleavedArraySpec extends FreeSpec with MustMatchers {
+class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
 
   "InterleavedArrayInt" - {
     "one interleaved tuple (a,b)" in {
