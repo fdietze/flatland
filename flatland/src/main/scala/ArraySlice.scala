@@ -2,7 +2,7 @@ package flatland
 
 import scala.collection.mutable
 
-final class ArraySliceInt(array: Array[Int], start: Int, val length: Int) extends IndexedSeq[Int] {
+@inline final class ArraySliceInt(array: Array[Int], start: Int, val length: Int) extends IndexedSeq[Int] {
   override protected[this] def newBuilder: mutable.Builder[Int, IndexedSeq[Int]] = new mutable.Builder[Int, IndexedSeq[Int]] {
     val self = new mutable.ArrayBuilder.ofInt
     override def +=(elem: Int): this.type = { self += elem; this }

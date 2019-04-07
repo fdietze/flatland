@@ -8,7 +8,7 @@ object ArrayStackInt {
   }
 }
 
-final class ArrayStackInt private (private val data: Array[Int]) extends AnyVal {
+@inline final class ArrayStackInt private (private val data: Array[Int]) extends AnyVal {
   @inline private def top = data(0)
   @inline private def incrementTop(): Unit = data(0) += 1
   @inline private def decrementTop(): Unit = data(0) -= 1
