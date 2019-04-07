@@ -35,22 +35,17 @@ import scala.reflect.ClassTag
     else None
   }
   @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
+  @inline def foreachIndex(idx: Int)(f: (Int) => Unit): Unit = {
+    loop(sliceLength(idx))(i => f(i))
+  }
   @inline def foreachElement(idx: Int)(f: Int => Unit): Unit = {
-    // fast iteration over sub-array without allocation
-    var i = 0
-    val n = sliceLength(idx)
-    while (i < n) {
+    foreachIndex(idx) { i =>
       f(apply(idx, i))
-      i += 1
     }
   }
   @inline def foreachIndexAndElement(idx: Int)(f: (Int, Int) => Unit): Unit = {
-    // fast iteration over sub-array without allocation
-    var i = 0
-    val n = sliceLength(idx)
-    while (i < n) {
+    foreachIndex(idx) { i =>
       f(i, apply(idx, i))
-      i += 1
     }
   }
   @inline def foreachIndexAndSlice(f: (Int, ArraySliceInt) => Unit): Unit = {
@@ -62,29 +57,32 @@ import scala.reflect.ClassTag
     idxArray.foreachElement { foreachElement(_)(f) }
   }
   @inline def forall(idx: Int)(f: Int => Boolean): Boolean = {
-    // fast iteration over sub-array without allocation
     var i = 0
     val n = sliceLength(idx)
-    while (i < n) {
-      if (!f(apply(idx, i))) return false
+    var all = true
+    while (all && i < n) {
+      if (!f(apply(idx, i))) all = false
       i += 1
     }
-    true
+    all
   }
+
   @inline def exists(idx: Int)(f: Int => Boolean): Boolean = {
-    // fast iteration over sub-array without allocation
     var i = 0
     val n = sliceLength(idx)
-    while (i < n) {
-      if (f(apply(idx, i))) return true
+    var notExists = true
+    while (notExists && i < n) {
+      if (f(apply(idx, i))) notExists = false
       i += 1
     }
-    false
+    !notExists
   }
-  @inline def contains(idx: Int)(elem: Int): Boolean = exists(idx)(_ == elem)
+
+  @inline def contains(idx: Int)(elem: Int): Boolean = {
+    exists(idx)(_ == elem)
+  }
 
   @inline def collectFirst[T](idx: Int)(f: PartialFunction[Int, T]): Option[T] = {
-    // fast iteration over sub-array without allocation
     var i = 0
     val n = sliceLength(idx)
     val safef: PartialFunction[Int, Unit] = f.andThen { t => return Some(t) }
@@ -95,21 +93,42 @@ import scala.reflect.ClassTag
     None
   }
 
-  @inline def count[T](idx: Int)(f: Int => Boolean): Int = {
-    // fast iteration over sub-array without allocation
-    var i = 0
+  @inline def count(idx: Int)(f: Int => Boolean): Int = {
     var counter = 0
-    val n = sliceLength(idx)
-    while (i < n) {
-      if (f(apply(idx, i))) counter += 1
-      i += 1
+    foreachElement(idx) { elem =>
+      if (f(elem)) counter += 1
     }
     counter
   }
 
+  @inline def foldLeft[T](idx: Int)(neutral: T)(f: (T, Int) => T): T = {
+    var agg: T = neutral
+    foreachElement(idx) { elem =>
+      agg = f(agg, elem)
+    }
+    agg
+  }
+
+  @inline def minByInt(idx: Int)(initMin: Int)(f: Int => Int): Int = {
+    var min = initMin
+    foreachElement(idx) { elem =>
+      val current = f(elem)
+      if (current < min) min = current
+    }
+    min
+  }
+
+  @inline def maxByInt(idx: Int)(initMax: Int)(f: Int => Int): Int = {
+    var max = initMax
+    foreachElement(idx) { elem =>
+      val current = f(elem)
+      if (current > max) max = current
+    }
+    max
+  }
+
   @inline def flatMap[T](idx: Int)(f: Int => Array[T])(implicit classTag: ClassTag[T]): Array[T] = {
     val result = Array.newBuilder[T]
-    // fast iteration over sub-array without allocation
     foreachElement(idx){ elem =>
       result ++= f(elem)
     }
@@ -119,7 +138,6 @@ import scala.reflect.ClassTag
   @inline def map[T](idx: Int)(f: Int => T)(implicit classTag: ClassTag[T]): Array[T] = {
     val n = sliceLength(idx)
     val result = new Array[T](n)
-    // fast iteration over sub-array without allocation
     foreachIndexAndElement(idx){ (i, elem) =>
       result(i) = f(elem)
     }
@@ -128,7 +146,6 @@ import scala.reflect.ClassTag
 
   @inline def collect[T](idx: Int)(f: PartialFunction[Int, T])(implicit classTag: ClassTag[T]): Array[T] = {
     val result = Array.newBuilder[T]
-    // fast iteration over sub-array without allocation
     val safef: PartialFunction[Int, Unit] = f.andThen { t => result += t }
     foreachIndexAndElement(idx){ (i, elem) =>
       safef.applyOrElse(elem, (_: Int) => ())

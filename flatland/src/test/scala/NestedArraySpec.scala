@@ -86,6 +86,34 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       nested.count(2)(_ > 3) mustEqual 0
     }
 
+    "forall" in {
+      val nested = NestedArrayInt(Array(Array(1, 2, 3), Array(1, 2, 3, 4), Array(1)))
+      nested.forall(0)(_ < 4) mustEqual true
+      nested.forall(1)(_ < 4) mustEqual false
+      nested.forall(2)(_ < 4) mustEqual true
+    }
+    "exists" in {
+      val nested = NestedArrayInt(Array(Array(1, 2, 3), Array(1, 2, 3, 4), Array(1)))
+      nested.exists(0)(_ > 3) mustEqual false
+      nested.exists(1)(_ > 3) mustEqual true
+      nested.exists(2)(_ > 3) mustEqual false
+    }
+    "foldLeft" in {
+      val nested = NestedArrayInt(Array(Array(1, 2, 3, 4), Array[Int]()))
+      nested.foldLeft(0)(0)((agg,e) => agg + e) mustEqual 10
+      nested.foldLeft(1)(7)((agg,e) => agg + e) mustEqual 7
+    }
+    "minByInt" in {
+      val nested = NestedArrayInt(Array(Array(8, 1, 2, 3, 4), Array[Int]()))
+      nested.minByInt(0)(19)(e => e+1) mustEqual 2
+      nested.minByInt(1)(13)(e => e+1) mustEqual 13
+    }
+    "maxByInt" in {
+      val nested = NestedArrayInt(Array(Array(1, 2, 3, 4, 2), Array[Int]()))
+      nested.maxByInt(0)(-19)(e => e+1) mustEqual 5
+      nested.maxByInt(1)(13)(e => e+1) mustEqual 13
+    }
+
     "collect" in {
       val nested = NestedArrayInt(Array(Array(701, 802, 903), Array(1, 2, 3)))
       nested.collect[String](0) { case x if x < 900 => x.toString }.toList mustEqual List("701", "802")
