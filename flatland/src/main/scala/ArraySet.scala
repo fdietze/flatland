@@ -28,6 +28,10 @@ object ArraySet {
     }
   }
 
+  @inline def clear(): Unit = {
+    marked.foreachIndex(remove)
+  }
+
   @inline def foreachIndexAndElement(f: (Int, Int) => Unit): Unit = {
     var index = 0
     marked.foreachIndex{ i =>
