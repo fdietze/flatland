@@ -39,7 +39,10 @@ class ArraySliceSpec extends FreeSpec with MustMatchers {
       val filtered = slice.filter(_ > 3)
       filtered.size mustEqual 1
       filtered(0) mustEqual 4
-
+    }
+    "is IndexedSeq" in {
+      val slice = new ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
+      slice.map(_.toString) mustEqual List("3","4")
     }
   }
 }
