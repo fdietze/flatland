@@ -1,6 +1,7 @@
 package flatland.test
 
 import flatland._
+import collection.mutable
 
 import org.scalatest._
 
@@ -9,21 +10,25 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
   "NestedArrayInt" - {
     "empty" in {
       val nested = NestedArrayInt(Array[Array[Int]]())
-      nested.isEmpty mustEqual true
       nested.length mustEqual 0
-      assertThrows[AnyRef](nested(0)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
+      nested.isEmpty mustEqual true
+      // assertThrows[AnyRef](nested(0)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
     }
     "one empty array" in {
       val nested = NestedArrayInt(Array(Array[Int]()))
-      nested.isEmpty mustEqual false
       nested.length mustEqual 1
+      nested.isEmpty mustEqual false
+      nested.sliceStart(0) mustEqual 1
+      nested.sliceLength(0) mustEqual 0
       nested(0).isEmpty mustEqual true
     }
     "one single-element array" in {
       val nested = NestedArrayInt(Array(Array(13)))
       nested.length mustEqual 1
-      nested(0)(0) mustEqual 13
+      nested.sliceStart(0) mustEqual 1
+      nested.sliceLength(0) mustEqual 1
       nested(0, 0) mustEqual 13
+      nested(0)(0) mustEqual 13
     }
     "two non-empty arrays" in {
       val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3)))
@@ -50,13 +55,27 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
         b ++= elems
         b
       }
-      val nested = NestedArrayInt(Array(builder(3), builder(), builder(0), builder(), builder(0, 1)))
+      val nested = NestedArrayInt(Array(builder(3), builder(), builder(0), null, builder(0, 1)))
       nested.length mustEqual 5
       nested(0).toList mustEqual List(3)
       nested(1).toList mustEqual List()
       nested(2).toList mustEqual List(0)
       nested(3).toList mustEqual List()
       nested(4).toList mustEqual List(0, 1)
+    }
+
+    "foreachIndex" in {
+      val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3)))
+      val agg = List.newBuilder[Int]
+      nested.foreachIndex(0)(agg += _)
+      assert(agg.result() == List(0, 1, 2))
+    }
+
+    "foreachElement" in {
+      val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3)))
+      val agg = List.newBuilder[Int]
+      nested.foreachElement(0)(agg += _)
+      assert(agg.result() == List(7, 8, 9))
     }
 
     "anyContains" in {
