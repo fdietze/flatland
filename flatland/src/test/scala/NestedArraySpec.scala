@@ -119,18 +119,18 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
     }
     "foldLeft" in {
       val nested = NestedArrayInt(Array(Array(1, 2, 3, 4), Array[Int]()))
-      nested.foldLeft(0)(0)((agg,e) => agg + e) mustEqual 10
-      nested.foldLeft(1)(7)((agg,e) => agg + e) mustEqual 7
+      nested.foldLeft(0)(0)((agg, e) => agg + e) mustEqual 10
+      nested.foldLeft(1)(7)((agg, e) => agg + e) mustEqual 7
     }
     "minByInt" in {
       val nested = NestedArrayInt(Array(Array(8, 1, 2, 3, 4), Array[Int]()))
-      nested.minByInt(0)(19)(e => e+1) mustEqual 2
-      nested.minByInt(1)(13)(e => e+1) mustEqual 13
+      nested.minByInt(0)(19)(e => e + 1) mustEqual 2
+      nested.minByInt(1)(13)(e => e + 1) mustEqual 13
     }
     "maxByInt" in {
       val nested = NestedArrayInt(Array(Array(1, 2, 3, 4, 2), Array[Int]()))
-      nested.maxByInt(0)(-19)(e => e+1) mustEqual 5
-      nested.maxByInt(1)(13)(e => e+1) mustEqual 13
+      nested.maxByInt(0)(-19)(e => e + 1) mustEqual 5
+      nested.maxByInt(1)(13)(e => e + 1) mustEqual 13
     }
 
     "collect" in {
@@ -162,5 +162,68 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       transposed(1).toList mustEqual List(0)
       transposed(2).toList mustEqual List(0, 1)
     }
+
+    "depth-first-search" - {
+      "one vertex" in {
+        val edges = NestedArrayInt(Array(Array[Int](0)))
+        val dfs = edges.depthFirstSearchToArray(0).toList
+        assert(dfs == List(0))
+      }
+
+      "directed cycle" in {
+        val edges = NestedArrayInt(Array(
+          Array(1, 2),
+          Array(3),
+          Array(1),
+          Array(0, 2)
+        ))
+
+        val dfs = edges.depthFirstSearchToArray(0).toList
+        assert(dfs == List(0, 2, 1, 3))
+      }
+
+      "avoid stack overflow" in {
+        val edges = NestedArrayInt(Array(
+          Array(4, 3, 2, 1),
+          Array(4, 3, 2),
+          Array[Int](),
+          Array[Int](),
+          Array[Int]()
+        ))
+
+        val dfs = edges.depthFirstSearchToArray(0).toList
+        assert(dfs == List(0, 1, 2, 3, 4))
+      }
+
+      "undirected cycle (diamond)" in {
+        val edges = NestedArrayInt(Array(
+          Array(1, 2),
+          Array(3),
+          Array[Int](),
+          Array(2)
+        ))
+
+        val dfs = edges.depthFirstSearchToArray(0).toList
+        assert(dfs == List(0, 2, 1, 3))
+      }
+
+      def generateLatticeGraph(size: Int): NestedArrayInt = {
+        val n = Math.sqrt(size).floor.toInt
+        NestedArrayInt.apply(Array.tabulate(size){ i =>
+          Array(i - 1).filter(x => x >= (i / n) * n) ++
+            Array(i + 1).filter(x => x <= ((i / n) * n + n - 1) && x < size) ++
+            Array(i - n).filter(x => x >= 0) ++
+            Array(i + n).filter(x => x < size)
+        })
+      }
+
+      "lattice graph" in {
+        val n = 4
+        val edges = generateLatticeGraph(n)
+
+        edges.depthFirstSearchToArray(0).toList mustEqual List(0, 2, 3, 1)
+      }
+    }
+
   }
 }

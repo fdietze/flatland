@@ -192,6 +192,48 @@ import scala.reflect.ClassTag
     }
     builder.result()
   }
+
+  def depthFirstSearchToArray(start: Int): Array[Int] = {
+    val builder = new mutable.ArrayBuilder.ofInt
+    depthFirstSearchGeneric(
+      init = (enqueue, _) => enqueue(start),
+      process = builder += _
+    )
+    builder.result()
+  }
+
+  // inline is important for inlining the lambda parameters
+  @inline def depthFirstSearchGeneric[A](
+    init: (Int => Unit, ArrayStackInt) => Unit,
+    process: Int => A,
+    advanceGuard: (A, () => Unit) => Unit = (agg:A, advance: () => Unit) => advance(),
+    loopConditionGuard: (() => Boolean) => Boolean = condition => condition()
+  ): Unit = {
+    val stack = ArrayStackInt.create(capacity = size)
+    val visited = ArraySet.create(size)
+
+    @inline def enqueue(elem: Int): Unit = {
+      stack.push(elem)
+      visited += elem
+    }
+
+    val loopGuard2: (() => Boolean) => Boolean = condition => condition()
+
+    init(enqueue, stack)
+    while (loopConditionGuard((() => !stack.isEmpty))) {
+      val current = stack.pop()
+      visited += current
+
+      advanceGuard(
+        process(current),
+        () => foreachElement(current) { next =>
+          if (visited.containsNot(next)) {
+            enqueue(next)
+          }
+        }
+      )
+    }
+  }
 }
 
 @inline final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
@@ -256,7 +298,7 @@ object NestedArrayInt {
       data(start) = sliceLength
       if (slice != null) slice.copyToArray(data, start + 1)
       currentStart += (sliceLength + 1)
-  }
+    }
     data(dataLength - 1) = n
 
     new NestedArrayInt(data)
@@ -278,11 +320,11 @@ object NestedArrayInt {
       data(i) = start
       data(start) = sliceLength
       currentStart += (sliceLength + 1)
-      }
+    }
     data(dataLength - 1) = n
 
     new NestedArrayInt(data)
-    }
+  }
 
   @inline def builder(sliceLengths: Array[Int]): NestedArrayIntBuilder = {
     new NestedArrayIntBuilder(apply(sliceLengths)) //, sliceLengths)
