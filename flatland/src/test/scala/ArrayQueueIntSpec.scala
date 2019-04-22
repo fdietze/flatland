@@ -4,7 +4,7 @@ import flatland._
 
 import org.scalatest._
 
-class ArrayQueueSpec extends FreeSpec with MustMatchers {
+class ArrayQueueIntSpec extends FreeSpec with MustMatchers {
 
   "ArrayQueueInt" - {
     def foreachElementCollect(queue: ArrayQueueInt): List[Int] = {
