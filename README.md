@@ -15,7 +15,10 @@ libraryDependencies += "com.github.fdietze" % "flatland" % "master-SNAPSHOT"
 When using [JitPack](https://jitpack.io), it is often more useful to point to a specific commit, to make your builds reproducible:
 
 ```scala
-libraryDependencies += "com.github.fdietze" % "flatland" % "10955d1d"
+libraryDependencies += "com.github.fdietze" % "flatland" % "7929c94"
+
+// instead, for ScalaJS:
+libraryDependencies += "com.github.fdietze.flatland" %%% "flatland" % "7929c94"
 ```
 
 ## Examples
