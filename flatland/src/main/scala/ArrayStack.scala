@@ -1,28 +1,23 @@
 package flatland
 
 object ArrayStackInt {
-  @inline def create(capacity: Int) = {
-    val data = new Array[Int](1 + capacity)
-    data(0) = 1 // initialize the top-pointer
-    new ArrayStackInt(data)
-  }
+  @inline def create(capacity: Int) = new ArrayStackInt(new Array[Int](capacity))
 }
 
-@inline final class ArrayStackInt private (private val data: Array[Int]) extends AnyVal {
-  @inline private def top = data(0)
-  @inline private def incrementTop(): Unit = data(0) += 1
-  @inline private def decrementTop(): Unit = data(0) -= 1
+@inline final class ArrayStackInt private (val stack: Array[Int], var top: Int = 0) {
+  @inline private def incrementTop(): Unit = top += 1
+  @inline private def decrementTop(): Unit = top -= 1
 
-  @inline def size = top - 1
-  @inline def isEmpty = top == 1
-  @inline def isFull = top == data.length
+  @inline def size = top
+  @inline def isEmpty = top == 0
+  @inline def isFull = top == stack.length
 
   @inline def push(value: Int) = {
-    data(top) = value
+    stack(top) = value
     incrementTop()
   }
   @inline def pop() = {
     decrementTop()
-    data(top)
+    stack(top)
   }
 }
