@@ -34,6 +34,14 @@ class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
       interleaved.y(0) mustEqual 7
     }
 
+    "one interleaved tuple (x,y) - update at once" in {
+      val interleaved = InterleavedArrayInt.create(1)
+      interleaved.update(0, 5, 7)
+
+      interleaved.x(0) mustEqual 5
+      interleaved.y(0) mustEqual 7
+    }
+
     "elementCount" in {
       val interleaved = InterleavedArrayInt.create(17)
       interleaved.elementCount mustEqual 17

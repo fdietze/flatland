@@ -16,6 +16,7 @@ object InterleavedArrayDouble {
   @inline def b(i: Int): Double = interleaved(i * 2 + 1)
   @inline def updatea(i: Int, value: Double): Unit = interleaved(i * 2) = value
   @inline def updateb(i: Int, value: Double): Unit = interleaved(i * 2 + 1) = value
+  @inline def update(i: Int, a: Double, b: Double): Unit = { updatea(i, a); updateb(i, b) }
 
   @inline def x(i: Int): Double = a(i)
   @inline def y(i: Int): Double = b(i)
