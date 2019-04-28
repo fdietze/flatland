@@ -181,4 +181,57 @@ package object flatland {
     }
   }
 
+  // inlining workarounds:
+  // (https://github.com/scala-js/scala-js/issues/3624)
+  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean =
+    condition => condition()
+  @inline private def advanceGuardDefault[PROCESSRESULT]: (PROCESSRESULT, () => Unit) => Unit =
+    (result: PROCESSRESULT, advance: () => Unit) => advance()
+  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit =
+    (elem, enqueue) => enqueue()
+
+  // inline is important for inlining the lambda parameters
+  @inline def depthFirstSearchGeneric[PROCESSRESULT](
+    vertexCount: Int,
+    foreachSuccessor: (Int, Int => Unit) => Unit, // (idx, f) => successors(idx).foreach(f)
+    init: (Int => Unit, ArrayStackInt) => Unit, // (enqueue,_) => enqueue(start)
+    processVertex: Int => PROCESSRESULT, // result += _
+    loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
+    advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
+    enqueueGuard1: (Int, () => Unit) => Unit = enqueueGuardDefault,
+    enqueueGuard2: (Int, () => Unit) => Unit = enqueueGuardDefault
+  ): Unit = {
+    val stack = ArrayStackInt.create(capacity = vertexCount)
+    val visited = ArraySet.create(vertexCount)
+
+    @inline def enqueue1(elem: Int): Unit = {
+      enqueueGuard1(elem, { () =>
+        stack.push(elem)
+        visited += elem
+      })
+    }
+
+    @inline def enqueue2(elem: Int): Unit = {
+      enqueueGuard2(elem, { () =>
+        stack.push(elem)
+        visited += elem
+      })
+    }
+
+    init(enqueue1, stack)
+    while (loopConditionGuard(() => !stack.isEmpty)) {
+      val current = stack.pop()
+      visited += current
+
+      advanceGuard(
+        processVertex(current),
+        () =>
+          foreachSuccessor(current, { next =>
+            if (visited.containsNot(next)) {
+              enqueue2(next)
+            }
+          })
+      )
+    }
+  }
 }

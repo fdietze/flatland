@@ -197,42 +197,40 @@ import scala.reflect.ClassTag
     val builder = new mutable.ArrayBuilder.ofInt
     depthFirstSearchGeneric(
       init = (enqueue, _) => enqueue(start),
-      process = builder += _
+      processVertex = builder += _
     )
     builder.result()
   }
 
+
+  // inlining workarounds:
+  // (https://github.com/scala-js/scala-js/issues/3624)
+  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean =
+    condition => condition()
+  @inline private def advanceGuardDefault[PROCESSRESULT]: (PROCESSRESULT, () => Unit) => Unit =
+    (result: PROCESSRESULT, advance: () => Unit) => advance()
+  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit =
+    (elem, enqueue) => enqueue()
+
   // inline is important for inlining the lambda parameters
-  @inline def depthFirstSearchGeneric[A](
+  @inline def depthFirstSearchGeneric[PROCESSRESULT](
     init: (Int => Unit, ArrayStackInt) => Unit,
-    process: Int => A,
-    advanceGuard: (A, () => Unit) => Unit = (agg:A, advance: () => Unit) => advance(),
-    loopConditionGuard: (() => Boolean) => Boolean = condition => condition()
+    processVertex: Int => PROCESSRESULT,
+    loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
+    advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
+    enqueueGuard1: (Int, () => Unit) => Unit = enqueueGuardDefault,
+    enqueueGuard2: (Int, () => Unit) => Unit = enqueueGuardDefault
   ): Unit = {
-    val stack = ArrayStackInt.create(capacity = size)
-    val visited = ArraySet.create(size)
-
-    @inline def enqueue(elem: Int): Unit = {
-      stack.push(elem)
-      visited += elem
-    }
-
-    val loopGuard2: (() => Boolean) => Boolean = condition => condition()
-
-    init(enqueue, stack)
-    while (loopConditionGuard((() => !stack.isEmpty))) {
-      val current = stack.pop()
-      visited += current
-
-      advanceGuard(
-        process(current),
-        () => foreachElement(current) { next =>
-          if (visited.containsNot(next)) {
-            enqueue(next)
-          }
-        }
-      )
-    }
+    flatland.depthFirstSearchGeneric(
+      vertexCount = length,
+      foreachSuccessor = (idx, f) => foreachElement(idx)(f),
+      init,
+      processVertex,
+      loopConditionGuard,
+      advanceGuard,
+      enqueueGuard1 = enqueueGuard1,
+      enqueueGuard2 = enqueueGuard2
+    )
   }
 }
 
