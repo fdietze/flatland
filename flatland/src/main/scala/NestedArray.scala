@@ -273,6 +273,8 @@ object NestedArrayInt {
     new NestedArrayInt(data)
   }
 
+  @inline def empty = new NestedArrayInt(data = Array(0))
+
   def apply(nested: Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
     // ArrayBuilders can also be null to represent an empty builder
     val n = nested.length
