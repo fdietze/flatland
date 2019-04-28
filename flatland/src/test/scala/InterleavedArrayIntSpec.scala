@@ -56,5 +56,10 @@ class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
 
       interleaved.toList mustEqual List((5, 7), (3, 4))
     }
+
+    "from IndexedSeq[(Int,Int)]" in {
+      val interleaved = InterleavedArrayInt.from(Array((3, 4), (7, 9)))
+      interleaved.toList mustEqual List((3, 4), (7, 9))
+    }
   }
 }
