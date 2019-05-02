@@ -76,6 +76,19 @@ import scala.reflect.ClassTag
     !notExists
   }
 
+  @inline def find(idx: Int)(f: Int => Boolean): Option[Int] = {
+    var i = 0
+    val n = sliceLength(idx)
+    var result: Option[Int] = None
+    while (result.isEmpty && i < n) {
+      val iValue = apply(idx, i)
+      if (f(iValue)) result = Some(iValue)
+      i += 1
+    }
+
+    result
+  }
+
   @inline def contains(idx: Int)(elem: Int): Boolean = {
     exists(idx)(_ == elem)
   }
