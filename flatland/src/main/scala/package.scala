@@ -194,7 +194,7 @@ package object flatland {
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
     vertexCount: Int,
     foreachSuccessor: (Int, Int => Unit) => Unit, // (idx, f) => successors(idx).foreach(f)
-    init: (Int => Unit, ArrayStackInt) => Unit, // (enqueue,_) => enqueue(start)
+    init: (Int => Unit, ArrayStackInt, ArraySet) => Unit, // (enqueue,_) => enqueue(start)
     processVertex: Int => PROCESSRESULT, // result += _
     loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
     advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
@@ -218,7 +218,7 @@ package object flatland {
       })
     }
 
-    init(enqueue1, stack)
+    init(enqueue1, stack, visited)
     while (loopConditionGuard(() => !stack.isEmpty)) {
       val current = stack.pop()
       visited += current
