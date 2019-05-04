@@ -209,7 +209,7 @@ import scala.reflect.ClassTag
   def depthFirstSearchToArray(start: Int): Array[Int] = {
     val builder = new mutable.ArrayBuilder.ofInt
     depthFirstSearchGeneric(
-      init = (enqueue, _, _) => enqueue(start),
+      init = (stack, _) => stack.push(start),
       processVertex = builder += _
     )
     builder.result()
@@ -227,12 +227,11 @@ import scala.reflect.ClassTag
 
   // inline is important for inlining the lambda parameters
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
-    init: (Int => Unit, ArrayStackInt, ArraySet) => Unit,
+    init: (ArrayStackInt, ArraySet) => Unit,
     processVertex: Int => PROCESSRESULT,
     loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
     advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
-    enqueueGuard1: (Int, () => Unit) => Unit = enqueueGuardDefault,
-    enqueueGuard2: (Int, () => Unit) => Unit = enqueueGuardDefault
+    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault,
   ): Unit = {
     flatland.depthFirstSearchGeneric(
       vertexCount = length,
@@ -241,8 +240,7 @@ import scala.reflect.ClassTag
       processVertex,
       loopConditionGuard,
       advanceGuard,
-      enqueueGuard1 = enqueueGuard1,
-      enqueueGuard2 = enqueueGuard2
+      enqueueGuard = enqueueGuard,
     )
   }
 }

@@ -194,43 +194,30 @@ package object flatland {
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
     vertexCount: Int,
     foreachSuccessor: (Int, Int => Unit) => Unit, // (idx, f) => successors(idx).foreach(f)
-    init: (Int => Unit, ArrayStackInt, ArraySet) => Unit, // (enqueue,_) => enqueue(start)
+    init: (ArrayStackInt, ArraySet) => Unit, // (stack,_) => stack.push(start)
     processVertex: Int => PROCESSRESULT, // result += _
     loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
     advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
-    enqueueGuard1: (Int, () => Unit) => Unit = enqueueGuardDefault,
-    enqueueGuard2: (Int, () => Unit) => Unit = enqueueGuardDefault
+    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault
   ): Unit = {
     val stack = ArrayStackInt.create(capacity = vertexCount)
     val visited = ArraySet.create(vertexCount)
 
-    @inline def enqueue1(elem: Int): Unit = {
-      enqueueGuard1(elem, { () =>
-        stack.push(elem)
-        visited += elem
-      })
-    }
-
-    @inline def enqueue2(elem: Int): Unit = {
-      enqueueGuard2(elem, { () =>
-        stack.push(elem)
-        visited += elem
-      })
-    }
-
-    init(enqueue1, stack, visited)
+    init(stack, visited)
     while (loopConditionGuard(() => !stack.isEmpty)) {
       val current = stack.pop()
       visited += current
 
       advanceGuard(
         processVertex(current),
-        () =>
-          foreachSuccessor(current, { next =>
-            if (visited.containsNot(next)) {
-              enqueue2(next)
-            }
-          })
+        () => foreachSuccessor(current, { next =>
+          if (visited.containsNot(next)) {
+            enqueueGuard(next, { () =>
+              stack.push(next)
+              visited += next
+            })
+          }
+        })
       )
     }
   }
