@@ -207,16 +207,26 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
         assert(dfs == List(0, 1, 2, 3, 4))
       }
 
-      "undirected cycle (diamond)" in {
+      "undirected cycle (diamond) - sink first" in {
         val edges = NestedArrayInt(Array(
-          Array(1, 2),
-          Array(3),
-          Array[Int](),
-          Array(2)
+          /* 0 -> */ Array(1, 2),
+          /* 1 -> */ Array(2),
+          /* 2 -> */ Array[Int]()
         ))
 
         val dfs = edges.depthFirstSearchToArray(0).toList
-        assert(dfs == List(0, 2, 1, 3))
+        assert(dfs == List(0, 2, 1))
+      }
+
+      "undirected cycle (diamond) - sink last" in {
+        val edges = NestedArrayInt(Array(
+          /* 0 -> */ Array(2, 1),
+          /* 1 -> */ Array(2),
+          /* 2 -> */ Array[Int]()
+        ))
+
+        val dfs = edges.depthFirstSearchToArray(0).toList
+        assert(dfs == List(0, 1, 2))
       }
 
       def generateLatticeGraph(size: Int): NestedArrayInt = {
