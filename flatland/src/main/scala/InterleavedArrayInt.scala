@@ -41,6 +41,8 @@ object InterleavedArrayInt {
   @inline def updateRight(i: Int, value: Int): Unit = updateb(i, value)
 
   @inline def elementCount: Int = interleaved.length / 2
+  @inline def isEmpty = elementCount == 0
+  @inline def nonEmpty = elementCount > 0
 
   @inline def foreachTwoElements(f: (Int, Int) => Unit): Unit = {
     val n = elementCount
@@ -59,5 +61,9 @@ object InterleavedArrayInt {
       f(i, a(i), b(i))
       i += 1
     }
+  }
+
+  def exists(f:(Int,Int) => Boolean):Boolean = {
+    flatland.exists(elementCount)(i => f(a(i), b(i)))
   }
 }

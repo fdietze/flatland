@@ -47,6 +47,12 @@ class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
       interleaved.elementCount mustEqual 17
     }
 
+    "exists" in {
+      val interleaved = InterleavedArrayInt(1 -> 3, 4 -> 4, 2 -> 5)
+      interleaved.exists(_ == _) mustEqual true
+      interleaved.exists(_ > _) mustEqual false
+    }
+
     "toIndexdSeq" in {
       val interleaved = InterleavedArrayInt.create(2)
       interleaved.updatex(0, 5)

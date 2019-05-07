@@ -10,6 +10,26 @@ package object flatland {
     }
   }
 
+  @inline def exists(n: Int)(f: Int => Boolean):Boolean = {
+    var i = 0
+    var notExists = true
+    while(notExists && i < n) {
+      notExists = !f(i) // on JS faster than if(f(i)) notExists = false
+      i += 1
+    }
+    !notExists
+  }
+
+  @inline def forall(n: Int)(f: Int => Boolean):Boolean = {
+    var i = 0
+    var all = true
+    while(all && i < n) {
+      all = f(i) // on JS faster than if(!f(i)) all = false
+      i += 1
+    }
+    all
+  }
+
   implicit final class RichIndexedSeq[T](val self: IndexedSeq[T]) extends AnyVal {
     @inline def minMax(smallerThan: (T, T) => Boolean): (T, T) = {
       if (self.isEmpty) throw new UnsupportedOperationException("minMax on empty sequence")
