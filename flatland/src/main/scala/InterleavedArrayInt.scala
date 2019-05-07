@@ -5,14 +5,18 @@ import scala.reflect.ClassTag
 object InterleavedArrayInt {
   @inline def create(n: Int): InterleavedArrayInt = new InterleavedArrayInt(new Array[Int](n * 2))
 
-  @inline def from(n: IndexedSeq[(Int, Int)]): InterleavedArrayInt = {
-    val interleaved = create(n.length)
-    n.foreachIndexAndElement{ (i, tuple) =>
+  @inline def apply(tuples: (Int,Int)*):InterleavedArrayInt = apply(tuples.toArray)
+  @inline def apply(tuples: IndexedSeq[(Int, Int)]): InterleavedArrayInt = {
+    val interleaved = create(tuples.length)
+    tuples.foreachIndexAndElement{ (i, tuple) =>
       interleaved.updatea(i, tuple._1)
       interleaved.updateb(i, tuple._2)
     }
     interleaved
   }
+
+  @inline def empty = create(0)
+
   implicit def toIndexdSeq(interleaved: InterleavedArrayInt): IndexedSeq[(Int, Int)] = new IndexedSeq[(Int, Int)] {
     def apply(idx: Int): (Int, Int) = (interleaved.a(idx), interleaved.b(idx))
     def length: Int = interleaved.elementCount
