@@ -88,6 +88,17 @@ package object flatland {
         i += 1
       }
     }
+
+    @inline def forallIndexAndElement(f: (Int, T) => Boolean): Boolean = {
+      val n = self.length
+      var i = 0
+      var all = true
+      while (all && i < n) {
+        if(!f(i, self(i))) all = false
+        i += 1
+      }
+      all
+    }
   }
 
   implicit final class RichArray[T](val array: Array[T]) extends AnyVal {
