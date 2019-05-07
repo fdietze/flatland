@@ -12,13 +12,11 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       val nested = NestedArrayInt(Array[Array[Int]]())
       nested.length mustEqual 0
       nested.isEmpty mustEqual true
-      // assertThrows[AnyRef](nested(0)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
     }
     "empty factory" in {
       val nested = NestedArrayInt.empty
       nested.length mustEqual 0
       nested.isEmpty mustEqual true
-      // assertThrows[AnyRef](nested(0)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
     }
     "one empty array" in {
       val nested = NestedArrayInt(Array(Array[Int]()))

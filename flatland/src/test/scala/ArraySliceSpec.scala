@@ -10,14 +10,12 @@ class ArraySliceSpec extends FreeSpec with MustMatchers {
     "empty" in {
       val slice = new ArraySliceInt(Array(), 0, 0)
       slice.isEmpty mustEqual true
-      assertThrows[AnyRef](slice(0)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
     }
     "single element" in {
       val slice = new ArraySliceInt(Array(7), 0, 1)
       slice.size mustEqual 1
       slice(0) mustEqual 7
       slice.toList mustEqual List(7)
-      assertThrows[AnyRef](slice(1)) // should be IndexOutOfBoundsException, but scalajs thows UndefinedBehaviorException
     }
     "single element on larger array" in {
       val slice = new ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
