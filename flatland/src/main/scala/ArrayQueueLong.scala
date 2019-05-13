@@ -14,7 +14,7 @@ object ArrayQueueLong {
   var end: Int = 0, // exclusive
   var length: Int = 0
 ) extends IndexedSeq[Long] {
-  @inline override def size = length
+  // @inline override def size = length
   @inline override def isEmpty = length == 0
   @inline def isFull = length == capacity
 

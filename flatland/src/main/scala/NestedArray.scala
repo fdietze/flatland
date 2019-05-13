@@ -16,7 +16,7 @@ import scala.reflect.ClassTag
 
 @inline final class NestedArrayInt(val data: Array[Int]) extends IndexedSeq[ArraySliceInt] {
   @inline def length: Int = data(0) // == data(data.length - 1)
-  @inline override def size: Int = length
+  // @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
   @inline override def nonEmpty: Boolean = length != 0
 

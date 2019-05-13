@@ -1,7 +1,7 @@
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
 
-val crossScalaVersionList = Seq("2.10.7", "2.11.12", "2.12.8")
+val crossScalaVersionList = Seq("2.10.7", "2.11.12", "2.12.8", "2.13.0-M5")
 val sharedSettings = Seq(
   crossScalaVersions := crossScalaVersionList,
   scalaVersion := crossScalaVersionList.last,
@@ -15,12 +15,12 @@ val sharedSettings = Seq(
     "-Xcheckinit" ::
     "-Xfuture" ::
     "-Xlint:-unused" ::
-    "-Ypartial-unification" ::
-    "-Yno-adapted-args" ::
-    "-Ywarn-infer-any" ::
-    "-Ywarn-value-discard" ::
-    "-Ywarn-nullary-override" ::
-    "-Ywarn-nullary-unit" ::
+    /* "-Ypartial-unification" :: */
+    /* "-Yno-adapted-args" :: */
+    /* "-Ywarn-infer-any" :: */
+    /* "-Ywarn-value-discard" :: */
+    /* "-Ywarn-nullary-override" :: */
+    /* "-Ywarn-nullary-unit" :: */
     Nil,
 
   resolvers ++=
@@ -62,7 +62,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
     crossScalaVersions := crossScalaVersionList,
     scalaVersion := crossScalaVersionList.last,
     libraryDependencies ++=
-      "com.github.fdietze.bench" %%% "bench" % "e66a721" ::
+      "com.github.fdietze.bench" %%% "bench" % "16e20ae" ::
       Nil,
     scalacOptions ++=
       "-Xdisable-assertions" ::
