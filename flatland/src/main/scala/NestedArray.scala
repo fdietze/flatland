@@ -3,25 +3,32 @@ package flatland
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
-// Simulates Array[Array[Int]] but stored only in one array for performance reasons.
-// data = (array of start positions)[length, sub-array elements](number of sub-arrays)
+// Simulates Array[Array[Int]] but stored only in one flat array for performance reasons.
+// data = n*sliceStart_i, n*(length_i, slice_i), n
+// note: the start of the first slice equals the number of sub-arrays,
+// since the slices start after n positions.
+// But we still need the last value for the empty-case.
 //
 // Many algorithms assume that the sub-arrays store indices into the outer array.
-// like depthFirstSearch()
+// like
+// - depthFirstSearch
+// - transposed
 
 @inline final class NestedArrayInt(val data: Array[Int]) extends IndexedSeq[ArraySliceInt] {
-  @inline def length: Int = data(data.length - 1)
+  @inline def length: Int = data(0) // == data(data.length - 1)
   @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
   @inline override def nonEmpty: Boolean = length != 0
 
-  @inline def sliceStart(idx: Int): Int = data(idx)
-  @inline def sliceLength(idx: Int): Int = data(sliceStart(idx))
+  @inline def sliceDataStart(idx: Int): Int = data(idx)
+  @inline def sliceStart(idx: Int): Int = sliceDataStart(idx) + 1
+  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
+  @inline def sliceEnd(idx: Int): Int = sliceStart(idx) + sliceLength(idx)
   @inline def sliceIsEmpty(idx: Int): Boolean = sliceLength(idx) == 0
   @inline def sliceNonEmpty(idx: Int): Boolean = sliceLength(idx) > 0
-  @inline private def dataIndex(idx1: Int, idx2: Int): Int = sliceStart(idx1) + idx2 + 1
+  @inline private def dataIndex(idx1: Int, idx2: Int): Int = sliceDataStart(idx1) + idx2 + 1
 
-  @inline def apply(idx: Int): ArraySliceInt = new ArraySliceInt(data, sliceStart(idx) + 1, sliceLength(idx))
+  @inline def apply(idx: Int): ArraySliceInt = new ArraySliceInt(data, sliceStart(idx), sliceLength(idx))
   @inline def safe(idx: Int): ArraySliceInt = {
     if (idx < 0 || length <= idx) new ArraySliceInt(data, 0, 0)
     else apply(idx)
@@ -32,48 +39,45 @@ import scala.reflect.ClassTag
       Some(apply(idx1, idx2))
     else None
   }
+
   @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
+
   @inline def foreachIndex(idx: Int)(f: (Int) => Unit): Unit = {
     loop(sliceLength(idx))(i => f(i))
   }
+
+  @inline def foreachIndex(f: (Int) => Unit): Unit = {
+    loop(length)(i => f(i))
+  }
+
   @inline def foreachElement(idx: Int)(f: Int => Unit): Unit = {
     foreachIndex(idx) { i =>
       f(apply(idx, i))
     }
   }
+
   @inline def foreachIndexAndElement(idx: Int)(f: (Int, Int) => Unit): Unit = {
     foreachIndex(idx) { i =>
       f(i, apply(idx, i))
     }
   }
+
   @inline def foreachIndexAndSlice(f: (Int, ArraySliceInt) => Unit): Unit = {
     loop(length) { i =>
       f(i, apply(i))
     }
   }
+
   @inline def foreachSliceAndElement(idxArray: Array[Int])(f: Int => Unit): Unit = {
     idxArray.foreachElement { foreachElement(_)(f) }
   }
+
   @inline def forall(idx: Int)(f: Int => Boolean): Boolean = {
-    var i = 0
-    val n = sliceLength(idx)
-    var all = true
-    while (all && i < n) {
-      if (!f(apply(idx, i))) all = false
-      i += 1
-    }
-    all
+    flatland.forall(sliceLength(idx))(i => f(apply(idx, i)))
   }
 
   @inline def exists(idx: Int)(f: Int => Boolean): Boolean = {
-    var i = 0
-    val n = sliceLength(idx)
-    var notExists = true
-    while (notExists && i < n) {
-      if (f(apply(idx, i))) notExists = false
-      i += 1
-    }
-    !notExists
+    flatland.exists(sliceLength(idx)) { i => f(apply(idx, i)) }
   }
 
   @inline def find(idx: Int)(f: Int => Boolean): Option[Int] = {
@@ -103,7 +107,7 @@ import scala.reflect.ClassTag
       val sliceLen = sliceLength(idx)
       i = 0
       while (notFound && i < sliceLen) {
-        if (apply(idx, i) == elem) notFound = false
+        notFound = apply(idx, i) != elem
         i += 1
       }
 
@@ -215,7 +219,6 @@ import scala.reflect.ClassTag
     builder.result()
   }
 
-
   // inlining workarounds:
   // (https://github.com/scala-js/scala-js/issues/3624)
   @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean =
@@ -243,6 +246,157 @@ import scala.reflect.ClassTag
       enqueueGuard = enqueueGuard,
     )
   }
+
+  def changedWithAssertions(
+    addIdx: Int = 0,
+    addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
+    delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
+  ): NestedArrayInt = {
+    assert(addElem.forall{ case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
+    assert(addElem.sortBy(_._1).sameElements(addElem), "addElem not sorted by idx")
+
+    assert(delElem.map(_._1).sorted.sameElements(delElem.map(_._1)), s"delElem: not sorted by idx: ${delElem.toList}")
+    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.sorted.sameElements(grouped._2)), s"delElem: positions not sorted: ${delElem.groupBy(_._1)}")
+    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.distinct.size == grouped._2.size), s"delElem: positions contains duplicates: ${delElem.groupBy(_._1)}")
+    assert(delElem.forall{case (idx, pos) => pos < sliceLength(idx)}, s"delElem: positon out of bounds: ${delElem.toList}")
+
+    changed(addIdx, addElem, delElem)
+  }
+
+  def changed(
+    addIdx: Int = 0,
+    addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
+    delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
+  ): NestedArrayInt = {
+    // IMPORTANT:
+    // For the operations to be efficient, changed() assumes all assertions from changedSafe.
+
+    // def debug(arr: Array[Int]) = {
+      // val length = arr(arr.length - 1)
+      // print(arr.take(length).map(x => f"$x%03d".replace("9999999", "___")).mkString("  ") + "| ")
+      // print(arr.drop(length).dropRight(1).map(x => f"$x%03d".replace("9999999", "___")).mkString("  "))
+      // println(f" |$length%03d")
+    // }
+
+    @inline def prev = this
+    // println(this.toVector.map(_.toVector))
+    // debug(prev.data)
+    // println(s"---addIdx: ${addIdx.toList}, addElem: ${addElem.toList}, delElem: ${delElem.toList}")
+    val nextDataSize = prev.data.length + (addIdx * 2) + addElem.length - delElem.length
+    // println(Array.tabulate(data.length max nextDataSize)(i => f"$i%03d").mkString(".."))
+    // println("-" * 80)
+    val nextData = new Array[Int](nextDataSize)
+    // val nextData = new {
+    //   // FOR DEBUGGING ONLY
+    //   val arr = Array.fill(nextDataSize)(9999999)
+    //   var reads = 0
+    //   var writes = 0
+    //   def length = arr.length
+    //   def apply(i:Int) = {reads += 1;arr(i)}
+    //   val written = mutable.HashSet.empty[Int]
+    //   def update(i:Int, elem:Int) = {
+    //     assert(!written.contains(i), s"writing to the same position twice: $i")
+    //     written += i
+    //     writes += 1
+    //     assert(i < length, s"write out of bounds: $i")
+    //     assert(writes <= length, s"more writes than necessary: $writes")
+    //     arr.update(i,elem)
+    //   }
+    // }
+    val next = new NestedArrayInt(nextData)
+
+    // set the number of slices
+    val sliceCount = prev.length + addIdx
+    nextData(nextData.length - 1) = sliceCount
+    // println("set number of slices")
+    // debug(nextData.arr)
+
+    // println("recalculate slice starts and lengths (using addElem, delElem)")
+    val addElemLength = addElem.length
+    val delElemLength = delElem.length
+    var addElemIdx = 0
+    var delElemIdx = 0
+    var sliceDataStartPos = prev.length + addIdx
+    loop(prev.length) { idx =>
+      nextData(idx) = sliceDataStartPos
+      var sliceLength = prev.sliceLength(idx)
+
+      // println(s"\n  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
+      var copySourcePos = prev.sliceStart(idx)
+      var copyTargetPos = sliceDataStartPos + 1 // pos after the length field
+      while(delElemIdx < delElemLength && delElem.a(delElemIdx) == idx) {
+        val delPos = prev.sliceStart(idx) + delElem.b(delElemIdx)
+        // println(s"    copy elements $copySourcePos -> $copyTargetPos until next deleted position $delPos")
+        while(copySourcePos < delPos) {
+          // println(s"    copyTargetPos: $copyTargetPos value: ${prev.data(copySourcePos)}")
+          nextData(copyTargetPos) = prev.data(copySourcePos)
+          copyTargetPos += 1
+          copySourcePos += 1
+        }
+        copySourcePos += 1 // skip deleted element
+        // debug(nextData.arr)
+
+
+        sliceLength -= 1
+        delElemIdx += 1
+        // println(s"  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
+      }
+      // println(s"    copy remaining elements $copySourcePos -> $copyTargetPos after deleted positions")
+      val sliceEnd = prev.sliceStart(idx) + prev.sliceLength(idx)
+      while(copySourcePos < sliceEnd) {
+        nextData(copyTargetPos) = prev.data(copySourcePos)
+        copyTargetPos += 1
+        copySourcePos += 1
+      }
+      // debug(nextData.arr)
+
+      // println(s"    add new elements to slice at $copyTargetPos")
+      while(addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
+        nextData(copyTargetPos) = addElem.b(addElemIdx)
+        copyTargetPos += 1
+        sliceLength += 1
+        addElemIdx += 1
+        // println(s"  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
+      }
+
+      // println("    set slice length")
+      nextData(sliceDataStartPos) = sliceLength
+      // debug(nextData.arr)
+
+      // now copy old slice data and skip deleted elements
+
+
+      sliceDataStartPos += (1 + sliceLength)
+      // debug(nextData.arr)
+    }
+
+    // println("calculate slice starts and lengths for added Idx")
+    loop(sliceCount, start = prev.length) { idx => // idx covers all elements in addIdx
+      nextData(idx) = sliceDataStartPos
+      var sliceLength = 0 // adding a fresh slice == insertion pos for added elements
+      var copyTargetPos = sliceDataStartPos+1 // pos after the length field
+      // println(s"write added elements into new slices at $copyTargetPos")
+      while(addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
+        nextData(copyTargetPos) = addElem.b(addElemIdx)
+        copyTargetPos += 1
+        sliceLength += 1
+        addElemIdx += 1
+        // println(s"  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
+      }
+
+      nextData(sliceDataStartPos) = sliceLength
+      sliceDataStartPos += (1 + sliceLength)
+      // debug(nextData.arr)
+    }
+    // debug(nextData.arr)
+
+
+    // println()
+    // println(s"reads: ${nextData.reads}, writes: ${nextData.writes} / ${nextData.length}")
+    // debug(nextData.arr)
+
+    next
+  }
 }
 
 @inline final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
@@ -261,11 +415,13 @@ import scala.reflect.ClassTag
 }
 
 object NestedArrayInt {
+  @inline def empty = new NestedArrayInt(data = Array(0))
+
   def apply(nested: Array[Array[Int]]): NestedArrayInt = {
     val n = nested.length
     var currentStart = n
     nested.foreachElement { slice =>
-      currentStart += (slice.length + 1)
+      currentStart += (1 + slice.length)
     }
 
     val dataLength = currentStart + 1 // 1 is for number of nested arrays
@@ -284,24 +440,21 @@ object NestedArrayInt {
     new NestedArrayInt(data)
   }
 
-  @inline def empty = new NestedArrayInt(data = Array(0))
-
-  def apply(nested: Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
+  def apply(builders: Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
     // ArrayBuilders can also be null to represent an empty builder
-    val n = nested.length
+    val n = builders.length
     var currentStart = n
     val arrays = new Array[Array[Int]](n)
-    nested.foreachIndexAndElement { (i, slice) =>
-      val array = if (slice == null) null else slice.result()
-      if (slice != null) slice.clear() //TODO remove!
+    builders.foreachIndexAndElement { (i, builder) =>
+      val array = if (builder == null) null else builder.result()
       arrays(i) = array
       currentStart += (if (array == null) 1 else (array.length + 1))
     }
 
-    val dataLength = currentStart + 1 // 1 is for number of nested arrays
+    val dataLength = currentStart + 1 // 1 is for number of builders arrays
     val data = new Array[Int](dataLength)
     currentStart = n
-    nested.foreachIndex { i =>
+    builders.foreachIndex { i =>
       val slice = arrays(i)
       val sliceLength = if (slice == null) 0 else slice.length
       val start = currentStart

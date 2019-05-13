@@ -22,14 +22,16 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       val nested = NestedArrayInt(Array(Array[Int]()))
       nested.length mustEqual 1
       nested.isEmpty mustEqual false
-      nested.sliceStart(0) mustEqual 1
+      nested.sliceDataStart(0) mustEqual 1
+      nested.sliceStart(0) mustEqual 2
       nested.sliceLength(0) mustEqual 0
       nested(0).isEmpty mustEqual true
     }
     "one single-element array" in {
       val nested = NestedArrayInt(Array(Array(13)))
       nested.length mustEqual 1
-      nested.sliceStart(0) mustEqual 1
+      nested.sliceDataStart(0) mustEqual 1
+      nested.sliceStart(0) mustEqual 2
       nested.sliceLength(0) mustEqual 1
       nested(0, 0) mustEqual 13
       nested(0)(0) mustEqual 13
@@ -244,6 +246,5 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
         edges.depthFirstSearchToArray(0).toList mustEqual List(0, 2, 3, 1)
       }
     }
-
   }
 }
