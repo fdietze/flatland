@@ -1,21 +1,10 @@
-lazy val flatland = (crossProject.crossType(CrossType.Pure))
-  .settings(
-    organization := "com.github.fdietze",
-    name := "flatland",
-    version := "master-SNAPSHOT",
-    crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.7"),
-    scalaVersion := crossScalaVersions.value.last,
-    libraryDependencies ++= (
-      "org.scalatest" %%% "scalatest" % "3.0.5" % Test ::
-      Nil
-    ),
+// shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
+import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
 
-  scalaJSStage in Test := FastOptStage, // not fullopt, because exceptions are removed by optimizations
-
-  initialCommands in console := """
-  import flatland._
-  """,
-
+val crossScalaVersionList = Seq("2.10.7", "2.11.12", "2.12.8")
+val sharedSettings = Seq(
+  crossScalaVersions := crossScalaVersionList,
+  scalaVersion := crossScalaVersionList.last,
   scalacOptions ++=
     "-encoding" :: "UTF-8" ::
     "-unchecked" ::
@@ -33,9 +22,29 @@ lazy val flatland = (crossProject.crossType(CrossType.Pure))
     "-Ywarn-nullary-override" ::
     "-Ywarn-nullary-unit" ::
     Nil,
-  )
-  .jvmSettings(
-    libraryDependencies += "org.scala-js" %% "scalajs-stubs" % scalaJSVersion % "provided"
+
+  resolvers ++=
+    ("jitpack" at "https://jitpack.io") ::
+    Nil,
+)
+
+lazy val flatland = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
+  .settings(sharedSettings)
+  .settings(
+    organization := "com.github.fdietze",
+    name := "flatland",
+    version := "master-SNAPSHOT",
+    libraryDependencies ++= (
+      "org.scalatest" %%% "scalatest" % "3.0.7" % Test ::
+      "org.scalacheck" %% "scalacheck" % "1.14.0" % Test ::
+      Nil
+    ),
+
+    scalaJSStage in Test := FullOptStage,
+
+    initialCommands in console := """
+      import flatland._
+      """,
   )
   .jsSettings(
     scalacOptions += {
@@ -45,5 +54,26 @@ lazy val flatland = (crossProject.crossType(CrossType.Pure))
     }
   )
 
-lazy val jvm = flatland.jvm
-lazy val js = flatland.js
+lazy val bench = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
+  .settings(sharedSettings)
+  .dependsOn(flatland)
+  .settings(
+    version := "0.1.0",
+    crossScalaVersions := crossScalaVersionList,
+    scalaVersion := crossScalaVersionList.last,
+    libraryDependencies ++=
+      "com.github.fdietze.bench" %%% "bench" % "e66a721" ::
+      Nil,
+    scalacOptions ++=
+      "-Xdisable-assertions" ::
+      "-opt:l:method" ::
+      "-opt:l:inline" ::
+      "-opt-inline-from:**" ::
+      Nil,
+  )
+
+  .jsSettings(
+    scalaJSStage in Compile := FullOptStage,
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSModuleKind := ModuleKind.CommonJSModule,
+  )
