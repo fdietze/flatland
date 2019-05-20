@@ -191,6 +191,19 @@ package object flatland {
 
       result
     }
+
+    @inline def flatMapWithIndex[R: ClassTag](f: (Int, T) => Array[R]): Array[R] = {
+      val n = array.length
+      var i = 0
+      val builder = Array.newBuilder[R]
+
+      while (i < n) {
+        builder ++= f(i, array(i))
+        i += 1
+      }
+
+      builder.result()
+    }
   }
 
   implicit final class RichIntArray(val array: Array[Int]) extends AnyVal {
