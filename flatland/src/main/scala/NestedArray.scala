@@ -162,7 +162,7 @@ import scala.reflect.ClassTag
     max
   }
 
-  @inline def flatMap[T](idx: Int)(f: Int => Array[T])(implicit classTag: ClassTag[T]): Array[T] = {
+  @inline def flatMap[T: ClassTag](idx: Int)(f: Int => Array[T]): Array[T] = {
     val result = Array.newBuilder[T]
     foreachElement(idx){ elem =>
       result ++= f(elem)
@@ -170,7 +170,7 @@ import scala.reflect.ClassTag
     result.result
   }
 
-  @inline def map[T](idx: Int)(f: Int => T)(implicit classTag: ClassTag[T]): Array[T] = {
+  @inline def map[T: ClassTag](idx: Int)(f: Int => T): Array[T] = {
     val n = sliceLength(idx)
     val result = new Array[T](n)
     foreachIndexAndElement(idx){ (i, elem) =>
@@ -179,7 +179,7 @@ import scala.reflect.ClassTag
     result
   }
 
-  @inline def collect[T](idx: Int)(f: PartialFunction[Int, T])(implicit classTag: ClassTag[T]): Array[T] = {
+  @inline def collect[T: ClassTag](idx: Int)(f: PartialFunction[Int, T]): Array[T] = {
     val result = Array.newBuilder[T]
     val safef: PartialFunction[Int, Unit] = f.andThen { t => result += t }
     foreachIndexAndElement(idx){ (i, elem) =>
