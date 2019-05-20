@@ -15,31 +15,31 @@ import scala.reflect.ClassTag
 // - depthFirstSearch
 // - transposed
 
-@inline final class NestedArrayInt(val data: Array[Int]) extends IndexedSeq[ArraySliceInt] {
-  @inline def length: Int = data(0) // == data(data.length - 1)
+trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
+  @inline def length: Int
   @inline override def isEmpty: Boolean = length == 0
 
-  @inline def sliceDataStart(idx: Int): Int = data(idx)
+  @inline def sliceDataStart(idx: Int): Int
   @inline def sliceStart(idx: Int): Int = sliceDataStart(idx) + 1
-  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
+  @inline def sliceLength(idx: Int): Int
   @inline def sliceEnd(idx: Int): Int = sliceStart(idx) + sliceLength(idx)
   @inline def sliceIsEmpty(idx: Int): Boolean = sliceLength(idx) == 0
   @inline def sliceNonEmpty(idx: Int): Boolean = sliceLength(idx) > 0
-  @inline private def dataIndex(idx1: Int, idx2: Int): Int = sliceDataStart(idx1) + idx2 + 1
+  @inline protected def dataIndex(idx1: Int, idx2: Int): Int = sliceDataStart(idx1) + idx2 + 1
 
-  @inline def apply(idx: Int): ArraySliceInt = new ArraySliceInt(data, sliceStart(idx), sliceLength(idx))
+  @inline def viewMapInt(f: Int => Int): NestedArrayInt
+
+  @inline def apply(idx: Int): ArraySliceInt
+  @inline def apply(idx1: Int, idx2: Int): Int
   @inline def safe(idx: Int): ArraySliceInt = {
-    if (idx < 0 || length <= idx) new ArraySliceInt(data, 0, 0)
+    if (idx < 0 || length <= idx) ArraySliceInt.empty
     else apply(idx)
   }
-  @inline def apply(idx1: Int, idx2: Int): Int = data(dataIndex(idx1, idx2))
   @inline def get(idx1: Int, idx2: Int): Option[Int] = {
     if (0 <= idx1 && idx1 < length && 0 <= idx2 && idx2 < sliceLength(idx1))
       Some(apply(idx1, idx2))
     else None
   }
-
-  @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
 
   @inline def foreachIndex(idx: Int)(f: (Int) => Unit): Unit = {
     loop(sliceLength(idx))(i => f(i))
@@ -273,12 +273,25 @@ import scala.reflect.ClassTag
       enqueueGuard = enqueueGuard
     )
   }
+}
+
+@inline final class NestedArrayIntValues(val data: Array[Int]) extends NestedArrayInt {
+  @inline def length: Int = data(0) // == data(data.length - 1)
+
+  @inline def sliceDataStart(idx: Int): Int = data(idx)
+  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
+  @inline def apply(idx: Int): ArraySliceInt = ArraySliceInt(data, sliceStart(idx), sliceLength(idx))
+  @inline def apply(idx1: Int, idx2: Int): Int = data(dataIndex(idx1, idx2))
+
+  @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
+
+  @inline def viewMapInt(f: Int => Int): NestedArrayInt = new NestedArrayIntMapped(data, f)
 
   def changedWithAssertions(
     addIdx: Int = 0,
     addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
     delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
-  ): NestedArrayInt = {
+  ): NestedArrayIntValues = {
     assert(addElem.forall{ case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
     assert(addElem.sortBy(_._1).iterator.sameElements(addElem.iterator), "addElem not sorted by idx")
 
@@ -294,7 +307,7 @@ import scala.reflect.ClassTag
     addIdx: Int = 0,
     addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
     delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
-  ): NestedArrayInt = {
+  ): NestedArrayIntValues = {
     // IMPORTANT:
     // For the operations to be efficient, changed() assumes all assertions from changedSafe.
 
@@ -330,7 +343,7 @@ import scala.reflect.ClassTag
     //     arr.update(i,elem)
     //   }
     // }
-    val next = new NestedArrayInt(nextData)
+    val next = new NestedArrayIntValues(nextData)
 
     // set the number of slices
     val sliceCount = prev.length + addIdx
@@ -426,7 +439,18 @@ import scala.reflect.ClassTag
   }
 }
 
-@inline final class NestedArrayIntBuilder(nestedArray: NestedArrayInt) {
+@inline final class NestedArrayIntMapped(data: Array[Int], mapped: Int => Int) extends NestedArrayInt {
+  @inline def length: Int = data(0) // == data(data.length - 1)
+
+  @inline def sliceDataStart(idx: Int): Int = data(idx)
+  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
+  @inline def apply(idx: Int): ArraySliceInt = new ArraySliceIntMapped(data, sliceStart(idx), sliceLength(idx), mapped)
+  @inline def apply(idx1: Int, idx2: Int): Int = mapped(data(dataIndex(idx1, idx2)))
+
+  @inline def viewMapInt(f: Int => Int): NestedArrayInt = new NestedArrayIntMapped(data, i => f(mapped(i)))
+}
+
+@inline final class NestedArrayIntBuilder(nestedArray: NestedArrayIntValues) {
   var filled = new Array[Int](nestedArray.length)
   def add(idx: Int, value: Int): Unit = {
     // assert(idx < nestedArray.length)
@@ -442,9 +466,9 @@ import scala.reflect.ClassTag
 }
 
 object NestedArrayInt {
-  @inline def empty = new NestedArrayInt(data = Array(0))
+  @inline def empty = new NestedArrayIntValues(data = Array(0))
 
-  def apply(nested: Array[Array[Int]]): NestedArrayInt = {
+  def apply(nested: Array[Array[Int]]): NestedArrayIntValues = {
     val n = nested.length
     var currentStart = n
     nested.foreachElement { slice =>
@@ -464,10 +488,10 @@ object NestedArrayInt {
     }
     data(dataLength - 1) = n
 
-    new NestedArrayInt(data)
+    new NestedArrayIntValues(data)
   }
 
-  def apply(builders: Array[mutable.ArrayBuilder.ofInt]): NestedArrayInt = {
+  def apply(builders: Array[mutable.ArrayBuilder.ofInt]): NestedArrayIntValues = {
     // ArrayBuilders can also be null to represent an empty builder
     val n = builders.length
     var currentStart = n
@@ -492,10 +516,10 @@ object NestedArrayInt {
     }
     data(dataLength - 1) = n
 
-    new NestedArrayInt(data)
+    new NestedArrayIntValues(data)
   }
 
-  def apply(sliceLengths: Array[Int]): NestedArrayInt = {
+  def apply(sliceLengths: Array[Int]): NestedArrayIntValues = {
     val n = sliceLengths.length
     var currentStart = n
     sliceLengths.foreachElement { sliceLength =>
@@ -514,7 +538,7 @@ object NestedArrayInt {
     }
     data(dataLength - 1) = n
 
-    new NestedArrayInt(data)
+    new NestedArrayIntValues(data)
   }
 
   @inline def builder(sliceLengths: Array[Int]): NestedArrayIntBuilder = {
