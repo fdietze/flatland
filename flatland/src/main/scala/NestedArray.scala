@@ -97,6 +97,16 @@ import scala.reflect.ClassTag
     exists(idx)(_ == elem)
   }
 
+  @inline def whileElement(idx: Int)(f: Int => Boolean): Unit = {
+    var i = 0
+    val n = sliceLength(idx)
+    var notFound = true
+    while (notFound && i < n) {
+      if (!f(apply(idx, i))) notFound = false
+      i += 1
+    }
+  }
+
   @inline def anyContains(elem: Int): Boolean = {
     val n = length
     var notFound = true

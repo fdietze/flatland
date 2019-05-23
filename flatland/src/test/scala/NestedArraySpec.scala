@@ -157,6 +157,23 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       nested.collectFirst[Int](1) { case 2 => -1 } mustEqual Some(-1)
     }
 
+    "whileElement" in {
+      val nested = NestedArrayInt(Array(Array(10, 11, 12), Array(1, 2, 3)))
+      var elements0 = Seq.empty[Int]
+      var elements1 = Seq.empty[Int]
+      nested.whileElement(0) { e =>
+        elements0 :+= e
+        e < 11
+      }
+      nested.whileElement(1) { e =>
+        elements1 :+= e
+        e > 3
+      }
+
+      elements0 mustEqual Seq(10, 11)
+      elements1 mustEqual Seq(1)
+    }
+
     "toArraySet" in {
       val nested = NestedArrayInt(Array(Array(0, 1), Array(0)))
       nested.toArraySet(0).collectAllElements.toList mustEqual List(0, 1)
