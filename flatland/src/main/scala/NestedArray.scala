@@ -84,9 +84,13 @@ import scala.reflect.ClassTag
     var i = 0
     val n = sliceLength(idx)
     var result: Option[Int] = None
-    while (result.isEmpty && i < n) {
-      val iValue = apply(idx, i)
-      if (f(iValue)) result = Some(iValue)
+    var notFound = true
+    while (notFound && i < n) {
+      val elem = apply(idx, i)
+      if (f(elem)) {
+        notFound = false
+        result = Some(elem)
+      }
       i += 1
     }
 
