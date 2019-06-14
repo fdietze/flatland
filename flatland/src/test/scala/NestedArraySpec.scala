@@ -129,6 +129,12 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
       nested.find(1)(_ > 1) mustEqual Some(2)
       nested.find(2)(_ > 1) mustEqual None
     }
+    "indexOf" in {
+      val nested = NestedArrayInt(Array(Array(3, 2, 1), Array(1, 2, 3, 4), Array(1)))
+      nested.indexOf(0)(1) mustEqual 2
+      nested.indexOf(1)(1) mustEqual 0
+      nested.indexOf(2)(5) mustEqual -1
+    }
     "foldLeft" in {
       val nested = NestedArrayInt(Array(Array(1, 2, 3, 4), Array[Int]()))
       nested.foldLeft(0)(0)((agg, e) => agg + e) mustEqual 10

@@ -97,6 +97,20 @@ import scala.reflect.ClassTag
     result
   }
 
+  @inline def indexOf(idx: Int)(elem: Int): Int = {
+    var i = 0
+    val n = sliceLength(idx)
+    var index = -1
+    while (index == -1 && i < n) {
+      if (apply(idx, i) == elem) {
+        index = i
+      }
+      i += 1
+    }
+
+    index
+  }
+
   @inline def contains(idx: Int)(elem: Int): Boolean = {
     exists(idx)(_ == elem)
   }
