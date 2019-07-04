@@ -16,10 +16,10 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val nested = NestedArrayInt.empty
 
       val patched = nested.changedWithAssertions(
-        addIdx = 1,
+        addIdx = 1
       )
       val expected = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](),
+        /* 0 -> */ Array[Int]()
       ))
 
       patched.data mustEqual expected.data
@@ -29,11 +29,11 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val nested = NestedArrayInt.empty
 
       val patched = nested.changedWithAssertions(
-        addIdx = 2,
+        addIdx = 2
       )
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](),
-        /* 1 -> */ Array[Int](),
+        /* 1 -> */ Array[Int]()
       ))
 
       patched.data mustEqual expected.data
@@ -47,7 +47,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
         addElem = InterleavedArrayInt((0, 22)) // already exists
       )
       val expected = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](22),
+        /* 0 -> */ Array[Int](22)
       ))
 
       patched.data mustEqual expected.data
@@ -212,7 +212,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](55, 33, 44, 999),
-        /* 2 -> */ Array[Int](66, 22, 888),
+        /* 2 -> */ Array[Int](66, 22, 888)
       ))
 
       patched.data mustEqual expected.data
@@ -227,7 +227,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       ))
 
       val patched = nested.changedWithAssertions(
-        addElem = InterleavedArrayInt(0 -> 0),
+        addElem = InterleavedArrayInt(0 -> 0)
       )
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](0),
@@ -251,7 +251,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](),
         /* 1 -> */ Array[Int](55, 33, 44),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -260,7 +260,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
     "delete elem and make slice empty 2 (found by scalacheck)" in {
       val nested = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](0),
-        /* 1 -> */ Array[Int](),
+        /* 1 -> */ Array[Int]()
       ))
 
       val patched = nested.changedWithAssertions(
@@ -268,7 +268,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       )
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](),
-        /* 1 -> */ Array[Int](),
+        /* 1 -> */ Array[Int]()
       ))
 
       patched.data mustEqual expected.data
@@ -277,7 +277,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
     "delete two elements from different slices (found by scalacheck)" in {
       val nested = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](22, 33),
-        /* 1 -> */ Array[Int](44, 55),
+        /* 1 -> */ Array[Int](44, 55)
       ))
 
       val patched = nested.changedWithAssertions(
@@ -285,7 +285,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       )
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](33),
-        /* 1 -> */ Array[Int](44),
+        /* 1 -> */ Array[Int](44)
       ))
 
       patched.data mustEqual expected.data
@@ -304,7 +304,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](55, 33),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -323,7 +323,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](33, 44),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -342,7 +342,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](55, 44),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -361,7 +361,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](55),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -380,7 +380,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](55, 44),
-        /* 2 -> */ Array[Int](66),
+        /* 2 -> */ Array[Int](66)
       ))
 
       patched.data mustEqual expected.data
@@ -399,7 +399,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
       val expected = NestedArrayInt(Array(
         /* 0 -> */ Array[Int](77),
         /* 1 -> */ Array[Int](),
-        /* 2 -> */ Array[Int](66, 22),
+        /* 2 -> */ Array[Int](66, 22)
       ))
 
       patched.data mustEqual expected.data
@@ -422,7 +422,7 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
         /* 1 -> */ Array[Int](55, 44),
         /* 2 -> */ Array[Int](66, 22, 11),
         /* 3 -> */ Array[Int](),
-        /* 4 -> */ Array[Int](99),
+        /* 4 -> */ Array[Int](99)
       ))
 
       patched.data mustEqual expected.data
@@ -430,15 +430,15 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
 
     "add and del one elem from same slice (found by scalacheck)" in {
       val nested = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](0),
+        /* 0 -> */ Array[Int](0)
       ))
 
       val patched = nested.changedWithAssertions(
         addElem = InterleavedArrayInt(0 -> 0),
-        delElem = InterleavedArrayInt(0 -> 0),
+        delElem = InterleavedArrayInt(0 -> 0)
       )
       val expected = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](0),
+        /* 0 -> */ Array[Int](0)
       ))
 
       
@@ -447,14 +447,14 @@ class NestedArrayChangeSpec extends FreeSpec with MustMatchers {
 
     "del both elems from first slice (found by scalacheck)" in {
       val nested = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](22, 44),
+        /* 0 -> */ Array[Int](22, 44)
       ))
 
       val patched = nested.changedWithAssertions(
-        delElem = InterleavedArrayInt(0 -> 0, 0 -> 1),
+        delElem = InterleavedArrayInt(0 -> 0, 0 -> 1)
       )
       val expected = NestedArrayInt(Array(
-        /* 0 -> */ Array[Int](),
+        /* 0 -> */ Array[Int]()
       ))
 
       

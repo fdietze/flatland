@@ -1,5 +1,6 @@
 package flatland
 
+import scala.collection.compat._
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -16,9 +17,7 @@ import scala.reflect.ClassTag
 
 @inline final class NestedArrayInt(val data: Array[Int]) extends IndexedSeq[ArraySliceInt] {
   @inline def length: Int = data(0) // == data(data.length - 1)
-  @inline override def size: Int = length
   @inline override def isEmpty: Boolean = length == 0
-  @inline override def nonEmpty: Boolean = length != 0
 
   @inline def sliceDataStart(idx: Int): Int = data(idx)
   @inline def sliceStart(idx: Int): Int = sliceDataStart(idx) + 1
@@ -262,7 +261,7 @@ import scala.reflect.ClassTag
     processVertex: Int => PROCESSRESULT,
     loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
     advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
-    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault,
+    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault
   ): Unit = {
     flatland.depthFirstSearchGeneric(
       vertexCount = length,
@@ -271,7 +270,7 @@ import scala.reflect.ClassTag
       processVertex,
       loopConditionGuard,
       advanceGuard,
-      enqueueGuard = enqueueGuard,
+      enqueueGuard = enqueueGuard
     )
   }
 
@@ -281,10 +280,10 @@ import scala.reflect.ClassTag
     delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
   ): NestedArrayInt = {
     assert(addElem.forall{ case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
-    assert(addElem.sortBy(_._1).sameElements(addElem), "addElem not sorted by idx")
+    assert(addElem.sortBy(_._1).iterator.sameElements(addElem.iterator), "addElem not sorted by idx")
 
-    assert(delElem.map(_._1).sorted.sameElements(delElem.map(_._1)), s"delElem: not sorted by idx: ${delElem.toList}")
-    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.sorted.sameElements(grouped._2)), s"delElem: positions not sorted: ${delElem.groupBy(_._1)}")
+    assert(delElem.map(_._1).sorted.iterator.sameElements(delElem.map(_._1).iterator), s"delElem: not sorted by idx: ${delElem.toList}")
+    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.sorted.iterator.sameElements(grouped._2.iterator)), s"delElem: positions not sorted: ${delElem.groupBy(_._1)}")
     assert(delElem.groupBy(_._1).forall( grouped => grouped._2.distinct.size == grouped._2.size), s"delElem: positions contains duplicates: ${delElem.groupBy(_._1)}")
     assert(delElem.forall{case (idx, pos) => pos < sliceLength(idx)}, s"delElem: positon out of bounds: ${delElem.toList}")
 

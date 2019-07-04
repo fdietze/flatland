@@ -2,7 +2,6 @@ package flatland.test.property
 
 import flatland._
 
-import collection.breakOut
 import org.scalacheck._
 import org.scalacheck.util.Pretty
 

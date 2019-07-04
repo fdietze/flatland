@@ -50,14 +50,14 @@ object NestedArray {
           generateLatticeGraph(size),
           3,
           InterleavedArrayInt(Array(0 -> 99999, 1 -> 99999, 2 -> 99999)),
-          InterleavedArrayInt(Array(0 -> 0, 1 -> 0, 2 -> 0)),
+          InterleavedArrayInt(Array(0 -> 0, 1 -> 0, 2 -> 0))
         ),
         {
           case (nestedArray, addIdx, addElem, delElem) =>
             nestedArray.changed(
               addIdx = addIdx,
               addElem = addElem,
-              delElem = delElem,
+              delElem = delElem
             )
         }
       )

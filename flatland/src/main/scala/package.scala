@@ -101,6 +101,18 @@ package object flatland {
     }
   }
 
+  implicit final class RichSeq[T](val self: Seq[T]) extends AnyVal {
+    @inline def foreachIndexAndElement(f: (Int, T) => Unit): Unit = {
+      val n = self.length
+      var i = 0
+
+      self.foreach { elem =>
+        f(i, elem)
+        i += 1
+      }
+    }
+  }
+
   implicit final class RichArray[T](val array: Array[T]) extends AnyVal {
     @inline def get(idx: Int): Option[T] = if (0 <= idx && idx < array.length) Some(array(idx)) else None
 
@@ -220,7 +232,7 @@ package object flatland {
 
     @inline def toArraySet(n: Int): ArraySet = {
       val marked = ArraySet.create(n)
-      marked.add(array)
+      array.foreachElement(marked.add)
       marked
     }
   }

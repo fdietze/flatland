@@ -1,5 +1,7 @@
 package flatland
 
+import scala.collection.immutable
+
 object ArrayQueueInt {
   @inline def create(capacity: Int) = {
     val data = new Array[Int](capacity)
@@ -13,8 +15,7 @@ object ArrayQueueInt {
   var start: Int = 0,
   var end: Int = 0, // exclusive
   var length: Int = 0
-) extends IndexedSeq[Int] {
-  @inline override def size = length
+) extends immutable.IndexedSeq[Int] {
   @inline override def isEmpty = length == 0
   @inline def isFull = length == capacity
 

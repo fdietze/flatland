@@ -1,6 +1,6 @@
 package flatland
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import scala.reflect.ClassTag
 
 object ArraySet {
@@ -66,8 +66,8 @@ object ArraySet {
     array
   }
 
-  @inline def map[B, That](f: Int => B)(implicit bf: CanBuildFrom[Array[Int], B, That]): That = {
-    val builder = bf(marked)
+  @inline def map[B, That](f: Int => B)(implicit bf: BuildFrom[Array[Int], B, That]): That = {
+    val builder = bf.newBuilder(marked)
     builder.sizeHint(calculateSize)
 
     foreach{ i =>

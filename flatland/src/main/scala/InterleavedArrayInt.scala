@@ -1,11 +1,12 @@
 package flatland
 
 import scala.reflect.ClassTag
+import collection.immutable
 
 object InterleavedArrayInt {
   @inline def create(n: Int): InterleavedArrayInt = new InterleavedArrayInt(new Array[Int](n * 2))
 
-  @inline def apply(tuples: (Int,Int)*):InterleavedArrayInt = apply(tuples.toArray)
+  @inline def apply(tuples: (Int,Int)*):InterleavedArrayInt = apply(tuples.toIndexedSeq)
   @inline def apply(tuples: IndexedSeq[(Int, Int)]): InterleavedArrayInt = {
     val interleaved = create(tuples.length)
     tuples.foreachIndexAndElement{ (i, tuple) =>
