@@ -11,8 +11,7 @@ jdk:
 - oraclejdk11
 
 script:
-- sbt ++$TRAVIS_SCALA_VERSION test
-- sbt ++$TRAVIS_SCALA_VERSION bench/compile
+- sbt ++$TRAVIS_SCALA_VERSION test benchJVM/compile benchJS/compile
 
 cache:
   directories:
