@@ -27,7 +27,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   @inline def sliceNonEmpty(idx: Int): Boolean = sliceLength(idx) > 0
   @inline protected def dataIndex(idx1: Int, idx2: Int): Int = sliceDataStart(idx1) + idx2 + 1
 
-  @inline def viewMapInt(f: Int => Int): NestedArrayInt
+  @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped
 
   @inline def apply(idx: Int): ArraySliceInt
   @inline def apply(idx1: Int, idx2: Int): Int
@@ -285,7 +285,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 
   @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
 
-  @inline def viewMapInt(f: Int => Int): NestedArrayInt = new NestedArrayIntMapped(data, f)
+  @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped = new NestedArrayIntMapped(data, f)
 
   def changedWithAssertions(
     addIdx: Int = 0,
@@ -447,7 +447,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   @inline def apply(idx: Int): ArraySliceInt = new ArraySliceIntMapped(data, sliceStart(idx), sliceLength(idx), mapped)
   @inline def apply(idx1: Int, idx2: Int): Int = mapped(data(dataIndex(idx1, idx2)))
 
-  @inline def viewMapInt(f: Int => Int): NestedArrayInt = new NestedArrayIntMapped(data, i => f(mapped(i)))
+  @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped = new NestedArrayIntMapped(data, i => f(mapped(i)))
 }
 
 @inline final class NestedArrayIntBuilder(nestedArray: NestedArrayIntValues) {
@@ -459,7 +459,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     filled(idx) += 1
   }
 
-  def result(): NestedArrayInt = {
+  def result(): NestedArrayIntValues = {
     filled = null
     nestedArray
   }
