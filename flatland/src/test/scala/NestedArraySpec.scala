@@ -269,5 +269,16 @@ class NestedArraySpec extends FreeSpec with MustMatchers {
         edges.depthFirstSearchToArray(0).toList mustEqual List(0, 2, 3, 1)
       }
     }
+
+    "viewMapInt" in {
+      val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3))).viewMapInt(_ + 1)
+      nested.length mustEqual 2
+      nested(0, 1) mustEqual 9
+      nested(0)(1) mustEqual 9
+      nested(1, 1) mustEqual 3
+      nested(1)(1) mustEqual 3
+      nested(0).toList mustEqual List(8, 9, 10)
+      nested(1).toList mustEqual List(2, 3, 4)
+    }
   }
 }

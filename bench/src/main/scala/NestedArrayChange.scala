@@ -9,7 +9,7 @@ import flatland._
 // ;set mainClass in Compile := Some("flatland.bench.NestedArrayChange"); run
 
 object NestedArrayChange {
-  def generateLatticeGraph(size: Int): NestedArrayInt = {
+  def generateLatticeGraph(size: Int): NestedArrayIntValues = {
     val n = Math.sqrt(size).floor.toInt
     NestedArrayInt(Array.tabulate(size){ i =>
       Array(i - 1).filter(x => x >= (i / n) * n) ++
@@ -22,7 +22,7 @@ object NestedArrayChange {
   def main(args: Array[String]): Unit = {
     assert(false, "assertions enabled")
     val comparison = Comparison("NestedArrayInt", Seq(
-      BenchmarkImmutableInit[(NestedArrayInt, Int)](
+      BenchmarkImmutableInit[(NestedArrayIntValues, Int)](
         "3x addIdx",
         size => (generateLatticeGraph(size), 3),
         {
@@ -30,7 +30,7 @@ object NestedArrayChange {
             nestedArray.changed(addIdx = addIdx)
         }
       ),
-      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt)](
+      BenchmarkImmutableInit[(NestedArrayIntValues, InterleavedArrayInt)](
         "addElem 3x at beginning",
         size => (generateLatticeGraph(size), InterleavedArrayInt(Array(0 -> 99999, 1 -> 99999, 2 -> 99999))),
         {
@@ -38,7 +38,7 @@ object NestedArrayChange {
             nestedArray.changed(addElem = addElem)
         }
       ),
-      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt)](
+      BenchmarkImmutableInit[(NestedArrayIntValues, InterleavedArrayInt)](
         "delElem 3x at beginning",
         size => (generateLatticeGraph(size), InterleavedArrayInt(Array(0 -> 0, 1 -> 0, 2 -> 0))),
         {
@@ -46,7 +46,7 @@ object NestedArrayChange {
             nestedArray.changed(delElem = delElem)
         }
       ),
-      BenchmarkImmutableInit[(NestedArrayInt, Int, InterleavedArrayInt, InterleavedArrayInt)](
+      BenchmarkImmutableInit[(NestedArrayIntValues, Int, InterleavedArrayInt, InterleavedArrayInt)](
         "addIdx, addElem, delElem 3x",
         size => (
           generateLatticeGraph(size),

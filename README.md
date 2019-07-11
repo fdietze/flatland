@@ -87,7 +87,7 @@ interleaved.foreachTwoElements((a,b) => println(s"($a,$b)"))
 import flatland._
 
 val array = Array(2,7,5,3,4,6)
-val slice = new ArraySliceInt(array, start = 3, length = 2)
+val slice = ArraySliceInt(array, start = 3, length = 2)
 slice(0) // 3
 slice(1) // 4
 slice.toList // List(3, 4)
