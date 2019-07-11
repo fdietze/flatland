@@ -5,8 +5,10 @@ import bench._
 import bench.util._
 import flatland._
 
-// set mainClass in Compile := Some("flatland.bench.NestedArray")
-object NestedArray {
+// to run this benchmark in JS:
+// ;set mainClass in Compile := Some("flatland.bench.NestedArrayChange"); run
+
+object NestedArrayChange {
   def generateLatticeGraph(size: Int): NestedArrayInt = {
     val n = Math.sqrt(size).floor.toInt
     NestedArrayInt(Array.tabulate(size){ i =>
