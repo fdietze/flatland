@@ -95,7 +95,7 @@ object NestedArrayDfs {
 
             builder.result()
         }
-      ),
+      )
     // BenchmarkImmutableInit[NestedArrayInt](
     //   "NestedArrayIntMapped",
     //   size => generateIndirectLatticeGraph(size),
@@ -105,7 +105,7 @@ object NestedArrayDfs {
     //       nestedArray.depthFirstSearchToArray(0)
     //       // println("dfs2 end")
     //   }
-    // ),
+    // )
     ))
     runComparison(comparison, List(100, 1000, 10000, 1000000), 60 seconds)
 
