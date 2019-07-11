@@ -18,8 +18,8 @@ object NestedArrayDfs {
         Array(i + n).filter(x => x < size)
     })
   }
-   
-  def generateLatticeGraph(size: Int): (NestedArrayInt, InterleavedArrayInt, NestedArrayInt) = {
+
+  def generateLatticeGraph(size: Int): (NestedArrayInt, InterleavedArrayInt, NestedArrayInt, NestedArrayInt) = {
     // indirect in the sense that the nestedArray stores edge indices (instead of vertex indices)
     // it is then mapped to lookup the node index in the edge array
     val successors = generateLatticeLookup(size)
@@ -36,31 +36,31 @@ object NestedArrayDfs {
     }
     val edges = InterleavedArrayInt(edgesBuilder.result)
     val incidenceLookup = NestedArrayInt(incidenceBuilder)
-    // val indirectIncidenceLookup = NestedArrayInt(incidenceBuilder).viewMapInt(edgeIdx => edges.right(edgeIdx))
+    val indirectIncidenceLookup = incidenceLookup.viewMapInt(edgeIdx => edges.right(edgeIdx))
 
     // if (successors.map(_.toList) != incidenceLookup.map(_.toList)) throw new Exception("Not Equal!")
 
-    (successors, edges, incidenceLookup)
+    (successors, edges, incidenceLookup, indirectIncidenceLookup)
   }
 
   def main(args: Array[String]): Unit = {
     assert(false, "assertions enabled")
     val comparison = Comparison("NestedArrayInt", Seq(
-      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt)](
+      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt, NestedArrayInt)](
         "NestedArrayIntValues",
         size => generateLatticeGraph(size),
         {
-          case (lookup, _, _) =>
+          case (lookup, _, _, _) =>
             // println("dfs1 start")
             lookup.depthFirstSearchToArray(0)
           // println("dfs1 end")
         }
       ),
-      // BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt)](
+      // BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt, NestedArrayInt)](
       //   "NestedArrayInt generic dfs",
       //   size => generateLatticeGraph(size),
       //   {
-      //     case (lookup, _, _) =>
+      //     case (lookup, _, _, _) =>
       //       val builder = new mutable.ArrayBuilder.ofInt
 
       //       flatland.depthFirstSearchGeneric(
@@ -76,11 +76,11 @@ object NestedArrayDfs {
       //       builder.result()
       //   }
       // ),
-      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt)](
+      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt, NestedArrayInt)](
         "NestedArrayInt indirect generic dfs",
         size => generateLatticeGraph(size),
         {
-          case (_, edges, lookup) =>
+          case (_, edges, lookup, _) =>
             val builder = new mutable.ArrayBuilder.ofInt
 
             flatland.depthFirstSearchGeneric(
@@ -95,19 +95,19 @@ object NestedArrayDfs {
 
             builder.result()
         }
+      ),
+      BenchmarkImmutableInit[(NestedArrayInt, InterleavedArrayInt, NestedArrayInt, NestedArrayInt)](
+        "NestedArrayIntMapped",
+        size => generateLatticeGraph(size),
+        {
+          case (_, _, _, lookup) =>
+            // println("dfs1 start")
+            lookup.depthFirstSearchToArray(0)
+          // println("dfs1 end")
+        }
       )
-    // BenchmarkImmutableInit[NestedArrayInt](
-    //   "NestedArrayIntMapped",
-    //   size => generateIndirectLatticeGraph(size),
-    //   {
-    //     nestedArray =>
-    //       // println("dfs2 start")
-    //       nestedArray.depthFirstSearchToArray(0)
-    //       // println("dfs2 end")
-    //   }
-    // )
     ))
-    runComparison(comparison, List(100, 1000, 10000, 1000000), 60 seconds)
+    runComparison(comparison, List(100, 1000, 10000), 120 seconds)
 
     ()
   }
