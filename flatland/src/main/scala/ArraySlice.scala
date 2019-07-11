@@ -1,10 +1,9 @@
 package flatland
 
-import scala.collection.mutable
+import scala.collection.immutable
 
-@inline final class ArraySliceInt(val array: Array[Int], val start: Int, val length: Int) extends mutable.IndexedSeq[Int] {
+@inline final class ArraySliceInt(val array: Array[Int], val start: Int, val length: Int) extends immutable.IndexedSeq[Int] {
   @inline override def apply(idx: Int): Int = array.apply(start + idx)
-  @inline override def update(idx: Int, elem: Int): Unit = array.update(start + idx, elem)
   @inline override def isEmpty = length == 0
   @inline override def slice(from: Int, until: Int): ArraySliceInt = new ArraySliceInt(array, start + from, until - from)
 
