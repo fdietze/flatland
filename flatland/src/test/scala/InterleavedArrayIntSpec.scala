@@ -67,5 +67,14 @@ class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
       val interleaved = InterleavedArrayInt(3 -> 4, 7 -> 9)
       interleaved.toList mustEqual List((3, 4), (7, 9))
     }
+
+    "builder" in {
+      val builder = InterleavedArrayInt.builder()
+      builder.add(5, 7)
+      builder.add(3, 4)
+
+      val interleaved = builder.result()
+      interleaved.toList mustEqual List((5, 7), (3, 4))
+    }
   }
 }
