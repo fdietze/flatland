@@ -4,7 +4,7 @@ import scala.reflect.ClassTag
 import collection.immutable
 
 object InterleavedArrayInt {
-  @inline def create(n: Int): InterleavedArrayInt = new InterleavedArrayInt(new Array[Int](n * 2))
+  @inline def create(n: Int): InterleavedArrayInt = new InterleavedArrayInt(new Array[Long](n))
 
   @inline def apply(tuples: (Int,Int)*):InterleavedArrayInt = apply(tuples.toIndexedSeq)
   @inline def apply(tuples: IndexedSeq[(Int, Int)]): InterleavedArrayInt = {
@@ -24,12 +24,16 @@ object InterleavedArrayInt {
   }
 }
 
-@inline final class InterleavedArrayInt(val interleaved: Array[Int]) {
-  @inline def a(i: Int): Int = interleaved(i * 2)
-  @inline def b(i: Int): Int = interleaved(i * 2 + 1)
-  @inline def updatea(i: Int, value: Int): Unit = interleaved(i * 2) = value
-  @inline def updateb(i: Int, value: Int): Unit = interleaved(i * 2 + 1) = value
-  @inline def update(i: Int, a: Int, b: Int): Unit = { updatea(i, a); updateb(i, b) }
+@inline final class InterleavedArrayInt(val interleaved: Array[Long]) {
+  @inline private def extractHi(l:Long):Int = (l >> 32).toInt
+  @inline private def extractLo(l:Long):Int = l.toInt
+  @inline private def combineToLong(a:Int, b:Int):Long = ((a.toLong) << 32) | (b & 0xffffffffL)
+
+  @inline def a(i: Int): Int = extractHi(interleaved(i))
+  @inline def b(i: Int): Int = extractLo(interleaved(i))
+  @inline def update(i: Int, a: Int, b: Int): Unit = { interleaved(i) = combineToLong(a,b) }
+  @inline def updatea(i: Int, value: Int): Unit = update(i, value, b(i))
+  @inline def updateb(i: Int, value: Int): Unit = update(i, a(i), value)
 
   @inline def x(i: Int): Int = a(i)
   @inline def y(i: Int): Int = b(i)
@@ -41,7 +45,7 @@ object InterleavedArrayInt {
   @inline def updateLeft(i: Int, value: Int): Unit = updatea(i, value)
   @inline def updateRight(i: Int, value: Int): Unit = updateb(i, value)
 
-  @inline def elementCount: Int = interleaved.length / 2
+  @inline def elementCount: Int = interleaved.length
   @inline def length: Int = elementCount
   @inline def size: Int = elementCount
   @inline def isEmpty = elementCount == 0
