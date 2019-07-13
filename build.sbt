@@ -61,7 +61,7 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pu
   )
   .jsSettings(
     scalacOptions += {
-      val local = baseDirectory.value.toURI
+      val local = (baseDirectory in LocalRootProject).value.toURI.toString
       val remote = s"https://raw.githubusercontent.com/fdietze/flatland/${git.gitHeadCommit.value.get}/"
       println(s"-P:scalajs:mapSourceURI:$local->$remote")
       s"-P:scalajs:mapSourceURI:$local->$remote"
