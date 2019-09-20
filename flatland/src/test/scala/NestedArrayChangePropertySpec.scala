@@ -141,7 +141,7 @@ object Helpers {
 
 import org.scalatest.FreeSpec
 import org.scalatestplus.scalacheck.Checkers
-import org.scalacheck.Prop.BooleanOperators
+import org.scalacheck.Prop.propBoolean
 import org.scalacheck._
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary._
