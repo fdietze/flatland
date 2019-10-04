@@ -13,7 +13,7 @@ val sharedSettings = Seq(
     "-explaintypes" ::
     "-feature" ::
     "-language:_" ::
-    "-Xcheckinit" ::
+    /* "-Xcheckinit" :: */
     /* "-Xfuture" :: */
     /* "-Xlint:-unused" :: */
     /* "-Ypartial-unification" :: */
