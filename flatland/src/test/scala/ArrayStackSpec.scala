@@ -3,8 +3,10 @@ package flatland.test
 import flatland._
 
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class ArrayStackSpec extends FreeSpec with MustMatchers {
+class ArrayStackSpec extends AnyFreeSpec with Matchers {
 
   "ArrayStackInt" - {
     "fill to full capacity" in {

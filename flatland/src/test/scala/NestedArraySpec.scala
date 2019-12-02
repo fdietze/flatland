@@ -4,8 +4,10 @@ import flatland._
 import collection.mutable
 
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class NestedArraySpec extends FreeSpec with MustMatchers {
+class NestedArraySpec extends AnyFreeSpec with Matchers {
 
   "NestedArrayInt" - {
     "empty" in {

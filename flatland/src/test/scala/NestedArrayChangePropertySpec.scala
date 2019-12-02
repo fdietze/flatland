@@ -4,6 +4,7 @@ import flatland._
 
 import org.scalacheck._
 import org.scalacheck.util.Pretty
+import org.scalatest.freespec.AnyFreeSpec
 
 object Helpers {
   case class NestedWithChanges(
@@ -139,7 +140,6 @@ object Helpers {
 
 }
 
-import org.scalatest.FreeSpec
 import org.scalatestplus.scalacheck.Checkers
 import org.scalacheck.Prop.propBoolean
 import org.scalacheck._
@@ -147,7 +147,7 @@ import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary._
 import Helpers._
 
-class NestedArrayChangePropertySpec extends FreeSpec with Checkers {
+class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
 
   val nestedArrays = arbitrary[Vector[Vector[Int]]]
   val nestedArraysWithChanges = for {

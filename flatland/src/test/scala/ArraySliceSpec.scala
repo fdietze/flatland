@@ -3,8 +3,10 @@ package flatland.test
 import flatland._
 
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class ArraySliceSpec extends FreeSpec with MustMatchers {
+class ArraySliceSpec extends AnyFreeSpec with Matchers {
 
   "ArraySliceInt" - {
     "empty" in {

@@ -4,8 +4,10 @@ import flatland._
 
 import org.scalatest._
 import collection.mutable
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class ArrayExtensionSpec extends FreeSpec with MustMatchers {
+class ArrayExtensionSpec extends AnyFreeSpec with Matchers {
 
   "Array Extension methods" - {
     "foreachIndex" in {
