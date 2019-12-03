@@ -100,7 +100,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .jsSettings(
     scalaJSStage in Compile := FullOptStage,
     scalaJSUseMainModuleInitializer := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
