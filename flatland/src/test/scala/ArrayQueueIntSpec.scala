@@ -3,8 +3,10 @@ package flatland.test
 import flatland._
 
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class ArrayQueueIntSpec extends FreeSpec with MustMatchers {
+class ArrayQueueIntSpec extends AnyFreeSpec with Matchers {
 
   "ArrayQueueInt" - {
     def foreachElementCollect(queue: ArrayQueueInt): List[Int] = {

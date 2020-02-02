@@ -4,8 +4,10 @@ import flatland._
 
 import org.scalatest._
 import collection.mutable
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class IndexedSeqExtensionSpec extends FreeSpec with MustMatchers {
+class IndexedSeqExtensionSpec extends AnyFreeSpec with Matchers {
 
   "IndexedSeq Extension methods" - {
     "foreachIndex" in {

@@ -3,8 +3,10 @@ package flatland.test
 import flatland._
 
 import org.scalatest._
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class InterleavedArrayIntSpec extends FreeSpec with MustMatchers {
+class InterleavedArrayIntSpec extends AnyFreeSpec with Matchers {
 
   "InterleavedArrayInt" - {
     "one interleaved tuple (a,b)" in {

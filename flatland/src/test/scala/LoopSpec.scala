@@ -4,8 +4,10 @@ import flatland._
 
 import org.scalatest._
 import collection.mutable
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 
-class LoopSpec extends FreeSpec with MustMatchers {
+class LoopSpec extends AnyFreeSpec with Matchers {
 
   "Simple Loop" - {
     val buffer = new mutable.ArrayBuffer[Int]
