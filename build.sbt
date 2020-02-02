@@ -28,7 +28,7 @@ val sharedSettings = Seq(
     ("jitpack" at "https://jitpack.io") ::
     Nil,
 
-  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.2",
+  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.3",
 
   /* scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0", */
   /* scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"), */
@@ -49,7 +49,8 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pu
     version := "master-SNAPSHOT",
     libraryDependencies ++= (
       "org.scalatest" %%% "scalatest" % "3.1.0" % Test ::
-      "org.scalacheck" %%% "scalacheck" % "1.14.2" % Test ::
+      "org.scalatestplus" %%% "scalatestplus-scalacheck" % "3.1.0.0-RC2" % Test ::
+      "org.scalacheck" %%% "scalacheck" % "1.14.3" % Test ::
       Nil
     ),
 
@@ -99,7 +100,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .jsSettings(
     scalaJSStage in Compile := FullOptStage,
     scalaJSUseMainModuleInitializer := true,
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
