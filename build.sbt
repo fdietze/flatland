@@ -1,6 +1,3 @@
-// shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
-import sbtcrossproject.CrossPlugin.autoImport.{ crossProject, CrossType }
-
 val crossScalaVersionList = Seq("2.11.12", "2.12.10", "2.13.1")
 val scalaMajorVersion = SettingKey[Int]("scalaMajorVersion")
 val sharedSettings = Seq(
@@ -18,6 +15,7 @@ val sharedSettings = Seq(
     /* "-Xlint:-unused" :: */
     /* "-Ypartial-unification" :: */
     /* "-Yno-adapted-args" :: */
+    /* "-Ywarn-infer-any" :: */
     /* "-Ywarn-infer-any" :: */
     "-Ywarn-value-discard" ::
     /* "-Ywarn-nullary-override" :: */
