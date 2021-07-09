@@ -26,7 +26,7 @@ val sharedSettings = Seq(
     ("jitpack" at "https://jitpack.io") ::
     Nil,
 
-  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.2",
+  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0",
 
   /* scalafixDependencies in ThisBuild += "org.scala-lang.modules" %% "scala-collection-migrations" % "2.0.0", */
   /* scalacOptions ++= List("-Yrangepos", "-P:semanticdb:synthetics:on"), */
