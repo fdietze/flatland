@@ -1,4 +1,4 @@
-val crossScalaVersionList = Seq("2.11.12", "2.12.10", "2.13.1")
+val crossScalaVersionList = Seq("2.11.12", "2.12.15", "2.13.1")
 val scalaMajorVersion = SettingKey[Int]("scalaMajorVersion")
 val sharedSettings = Seq(
   crossScalaVersions := crossScalaVersionList,
