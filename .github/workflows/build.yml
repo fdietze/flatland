@@ -20,7 +20,7 @@ jobs:
       - uses: olafurpg/setup-scala@v12
 
       - name: Test
-        run: sbt "++${{matrix.scalaVersion}} test benchJVM/compile benchJS/compile"
+        run: sbt "++${{matrix.scalaVersion}}" test benchJVM/compile benchJS/compile
 
       # - name: Debug over SSH (tmate)
       #   # if: ${{ failure() }}
