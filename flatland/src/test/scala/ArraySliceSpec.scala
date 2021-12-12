@@ -28,25 +28,25 @@ class ArraySliceSpec extends AnyFreeSpec with Matchers {
     }
     "sub slice" in {
       val initial = ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 1, 4)
-      val slice = initial.slice(2, 4)
+      val slice   = initial.slice(2, 4)
       slice.size mustEqual 2
       slice(0) mustEqual 3
       slice(1) mustEqual 4
       slice.toList mustEqual List(3, 4)
     }
     "filter" in {
-      val slice = ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
+      val slice    = ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
       val filtered = slice.filter(_ > 3)
       filtered.size mustEqual 1
       filtered(0) mustEqual 4
     }
     "is IndexedSeq" in {
       val slice = ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
-      slice.map(_.toString) mustEqual List("3","4")
+      slice.map(_.toString) mustEqual List("3", "4")
     }
     "viewMapInt" in {
       val slice = ArraySliceInt(Array(2, 7, 5, 3, 4, 6), 3, 2)
-      slice.viewMapInt(_ + 1).map(_.toString) mustEqual List("4","5")
+      slice.viewMapInt(_ + 1).map(_.toString) mustEqual List("4", "5")
     }
   }
 }

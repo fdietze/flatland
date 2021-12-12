@@ -1,4 +1,8 @@
 target/
 *.gpg
 sonatype.sbt
-project/metals.sbt
+metals.sbt
+.bloop/
+/.bsp
+
+

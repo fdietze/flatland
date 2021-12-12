@@ -10,20 +10,20 @@ package object flatland {
     }
   }
 
-  @inline def exists(n: Int)(f: Int => Boolean):Boolean = {
-    var i = 0
+  @inline def exists(n: Int)(f: Int => Boolean): Boolean = {
+    var i         = 0
     var notExists = true
-    while(notExists && i < n) {
+    while (notExists && i < n) {
       notExists = !f(i) // on JS faster than if(f(i)) notExists = false
       i += 1
     }
     !notExists
   }
 
-  @inline def forall(n: Int)(f: Int => Boolean):Boolean = {
-    var i = 0
+  @inline def forall(n: Int)(f: Int => Boolean): Boolean = {
+    var i   = 0
     var all = true
-    while(all && i < n) {
+    while (all && i < n) {
       all = f(i) // on JS faster than if(!f(i)) all = false
       i += 1
     }
@@ -90,11 +90,11 @@ package object flatland {
     }
 
     @inline def forallIndexAndElement(f: (Int, T) => Boolean): Boolean = {
-      val n = self.length
-      var i = 0
+      val n   = self.length
+      var i   = 0
       var all = true
       while (all && i < n) {
-        if(!f(i, self(i))) all = false
+        if (!f(i, self(i))) all = false
         i += 1
       }
       all
@@ -118,29 +118,29 @@ package object flatland {
 
     @inline def filterIdx(p: Int => Boolean)(implicit ev: ClassTag[T]): Array[T] = {
       val builder = mutable.ArrayBuilder.make[T]
-      array.foreachIndexAndElement{ (i, elem) =>
+      array.foreachIndexAndElement { (i, elem) =>
         if (p(i)) builder += elem
       }
       builder.result()
     }
 
     @inline def findIdx(p: T => Boolean): Option[Int] = {
-      array.foreachIndexAndElement{ (i, elem) =>
+      array.foreachIndexAndElement { (i, elem) =>
         if (p(elem)) return Some(i)
       }
       None
     }
 
     @inline def findIdxByIdx(p: Int => Boolean): Option[Int] = {
-      array.foreachIndex{ i =>
+      array.foreachIndex { i =>
         if (p(i)) return Some(i)
       }
       None
     }
 
     @inline def filterIdxToArraySet(p: Int => Boolean): (ArraySet, Int) = {
-      val set = ArraySet.create(array.length)
-      var i = 0
+      val set  = ArraySet.create(array.length)
+      var i    = 0
       var size = 0
       while (i < array.length) {
         if (p(i)) {
@@ -192,8 +192,8 @@ package object flatland {
     }
 
     @inline def mapWithIndex[R: ClassTag](f: (Int, T) => R): Array[R] = {
-      val n = array.length
-      var i = 0
+      val n      = array.length
+      var i      = 0
       val result = new Array[R](n)
 
       while (i < n) {
@@ -205,8 +205,8 @@ package object flatland {
     }
 
     @inline def flatMapWithIndex[R: ClassTag](f: (Int, T) => Array[R]): Array[R] = {
-      val n = array.length
-      var i = 0
+      val n       = array.length
+      var i       = 0
       val builder = Array.newBuilder[R]
 
       while (i < n) {
@@ -221,7 +221,7 @@ package object flatland {
   implicit final class RichIntArray(val array: Array[Int]) extends AnyVal {
     @inline def filterIndex(p: Int => Boolean): Array[Int] = {
       val builder = new mutable.ArrayBuilder.ofInt
-      var i = 0
+      var i       = 0
       while (i < array.length) {
         if (p(i))
           builder += array(i)
@@ -239,24 +239,24 @@ package object flatland {
 
   // inlining workarounds:
   // (https://github.com/scala-js/scala-js/issues/3624)
-  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean =
+  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean                   =
     condition => condition()
   @inline private def advanceGuardDefault[PROCESSRESULT]: (PROCESSRESULT, () => Unit) => Unit =
     (result: PROCESSRESULT, advance: () => Unit) => advance()
-  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit =
+  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit                          =
     (elem, enqueue) => enqueue()
 
   // inline is important for inlining the lambda parameters
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
-    vertexCount: Int,
-    foreachSuccessor: (Int, Int => Unit) => Unit, // (idx, f) => successors(idx).foreach(f)
-    init: (ArrayStackInt, ArraySet) => Unit, // (stack,_) => stack.push(start)
-    processVertex: Int => PROCESSRESULT, // result += _
-    loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
-    advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
-    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault
+      vertexCount: Int,
+      foreachSuccessor: (Int, Int => Unit) => Unit, // (idx, f) => successors(idx).foreach(f)
+      init: (ArrayStackInt, ArraySet) => Unit,      // (stack,_) => stack.push(start)
+      processVertex: Int => PROCESSRESULT,          // result += _
+      loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
+      advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
+      enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault,
   ): Unit = {
-    val stack = ArrayStackInt.create(capacity = vertexCount)
+    val stack   = ArrayStackInt.create(capacity = vertexCount)
     val visited = ArraySet.create(vertexCount)
 
     init(stack, visited)
@@ -266,14 +266,21 @@ package object flatland {
 
       advanceGuard(
         processVertex(current),
-        () => foreachSuccessor(current, { next =>
-          if (visited.containsNot(next)) {
-            enqueueGuard(next, { () =>
-              stack.push(next)
-              visited += next
-            })
-          }
-        })
+        () =>
+          foreachSuccessor(
+            current,
+            { next =>
+              if (visited.containsNot(next)) {
+                enqueueGuard(
+                  next,
+                  { () =>
+                    stack.push(next)
+                    visited += next
+                  },
+                )
+              }
+            },
+          ),
       )
     }
   }

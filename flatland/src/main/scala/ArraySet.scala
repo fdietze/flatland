@@ -9,21 +9,21 @@ object ArraySet {
 
 @inline final class ArraySet(val marked: Array[Int]) extends AnyVal {
   //TODO: track number of added nodes to speed up map and allElements
-  @inline def add(elem: Int): Unit = marked(elem) = 1
-  @inline def add(elems: IndexedSeq[Int]): Unit = elems.foreachElement(add)
-  @inline def remove(elem: Int): Unit = marked(elem) = 0
+  @inline def add(elem: Int): Unit                 = marked(elem) = 1
+  @inline def add(elems: IndexedSeq[Int]): Unit    = elems.foreachElement(add)
+  @inline def remove(elem: Int): Unit              = marked(elem) = 0
   @inline def remove(elems: IndexedSeq[Int]): Unit = elems.foreachElement(remove)
-  @inline def contains(elem: Int): Boolean = marked(elem) == 1
-  @inline def containsNot(elem: Int): Boolean = marked(elem) == 0
+  @inline def contains(elem: Int): Boolean         = marked(elem) == 1
+  @inline def containsNot(elem: Int): Boolean      = marked(elem) == 0
 
-  @inline def apply(elem: Int): Boolean = contains(elem)
-  @inline def +=(elem: Int): Unit = add(elem)
+  @inline def apply(elem: Int): Boolean         = contains(elem)
+  @inline def +=(elem: Int): Unit               = add(elem)
   @inline def ++=(elems: IndexedSeq[Int]): Unit = add(elems)
-  @inline def -=(elem: Int): Unit = remove(elem)
+  @inline def -=(elem: Int): Unit               = remove(elem)
   @inline def --=(elems: IndexedSeq[Int]): Unit = remove(elems)
 
   @inline def foreach(f: Int => Unit): Unit = {
-    marked.foreachIndex{ i =>
+    marked.foreachIndex { i =>
       if (contains(i)) f(i)
     }
   }
@@ -34,7 +34,7 @@ object ArraySet {
 
   @inline def foreachIndexAndElement(f: (Int, Int) => Unit): Unit = {
     var index = 0
-    marked.foreachIndex{ i =>
+    marked.foreachIndex { i =>
       if (contains(i)) {
         f(index, i)
         index += 1
@@ -43,14 +43,14 @@ object ArraySet {
   }
 
   @inline def calculateIsEmpty: Boolean = {
-    foreach{ _ => return false }
+    foreach { _ => return false }
     true
   }
   @inline def calculateNonEmpty: Boolean = !calculateIsEmpty
 
   @inline def calculateSize: Int = {
     var size = 0
-    marked.foreachIndex{ i =>
+    marked.foreachIndex { i =>
       if (contains(i)) size += 1
     }
     size
@@ -58,8 +58,8 @@ object ArraySet {
 
   @inline def mapToArray[T](f: Int => T)(implicit classTag: ClassTag[T]): Array[T] = {
     val array = new Array[T](calculateSize)
-    var pos = 0
-    foreach{ i =>
+    var pos   = 0
+    foreach { i =>
       array(pos) = f(i)
       pos += 1
     }
@@ -70,7 +70,7 @@ object ArraySet {
     val builder = bf.newBuilder(marked)
     builder.sizeHint(calculateSize)
 
-    foreach{ i =>
+    foreach { i =>
       builder += f(i)
     }
 
@@ -79,8 +79,8 @@ object ArraySet {
 
   @inline def collectAllElements: Array[Int] = {
     val array = new Array[Int](calculateSize)
-    var pos = 0
-    foreach{ i =>
+    var pos   = 0
+    foreach { i =>
       array(pos) = i
       pos += 1
     }
@@ -88,9 +88,9 @@ object ArraySet {
   }
 
   @inline def partition(p: Int => Boolean): (ArraySet, ArraySet) = {
-    val trueSet = ArraySet.create(marked.length)
+    val trueSet  = ArraySet.create(marked.length)
     val falseSet = ArraySet.create(marked.length)
-    foreach{ i =>
+    foreach { i =>
       if (p(i)) trueSet.add(i)
       else falseSet.add(i)
     }

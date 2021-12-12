@@ -74,14 +74,14 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
 
     "foreachIndex" in {
       val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3)))
-      val agg = List.newBuilder[Int]
+      val agg    = List.newBuilder[Int]
       nested.foreachIndex(0)(agg += _)
       assert(agg.result() == List(0, 1, 2))
     }
 
     "foreachElement" in {
       val nested = NestedArrayInt(Array(Array(7, 8, 9), Array(1, 2, 3)))
-      val agg = List.newBuilder[Int]
+      val agg    = List.newBuilder[Int]
       nested.foreachElement(0)(agg += _)
       assert(agg.result() == List(7, 8, 9))
     }
@@ -166,7 +166,7 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
     }
 
     "whileElement" in {
-      val nested = NestedArrayInt(Array(Array(10, 11, 12), Array(1, 2, 3)))
+      val nested    = NestedArrayInt(Array(Array(10, 11, 12), Array(1, 2, 3)))
       var elements0 = Seq.empty[Int]
       var elements1 = Seq.empty[Int]
       nested.whileElement(0) { e =>
@@ -189,11 +189,13 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
     }
 
     "transpose" in {
-      val nested = NestedArrayInt(Array(
-        /* 0 */ Array[Int](1, 2),
-        /* 1 */ Array[Int](2),
-        /* 2 */ Array[Int]()
-      ))
+      val nested     = NestedArrayInt(
+        Array(
+          /* 0 */ Array[Int](1, 2),
+          /* 1 */ Array[Int](2),
+          /* 2 */ Array[Int](),
+        ),
+      )
       val transposed = nested.transposed
       transposed(0).toList mustEqual List()
       transposed(1).toList mustEqual List(0)
@@ -203,52 +205,60 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
     "depth-first-search" - {
       "one vertex" in {
         val edges = NestedArrayInt(Array(Array[Int](0)))
-        val dfs = edges.depthFirstSearchToArray(0).toList
+        val dfs   = edges.depthFirstSearchToArray(0).toList
         assert(dfs == List(0))
       }
 
       "directed cycle" in {
-        val edges = NestedArrayInt(Array(
-          Array(1, 2),
-          Array(3),
-          Array(1),
-          Array(0, 2)
-        ))
+        val edges = NestedArrayInt(
+          Array(
+            Array(1, 2),
+            Array(3),
+            Array(1),
+            Array(0, 2),
+          ),
+        )
 
         val dfs = edges.depthFirstSearchToArray(0).toList
         assert(dfs == List(0, 2, 1, 3))
       }
 
       "avoid stack overflow" in {
-        val edges = NestedArrayInt(Array(
-          Array(4, 3, 2, 1),
-          Array(4, 3, 2),
-          Array[Int](),
-          Array[Int](),
-          Array[Int]()
-        ))
+        val edges = NestedArrayInt(
+          Array(
+            Array(4, 3, 2, 1),
+            Array(4, 3, 2),
+            Array[Int](),
+            Array[Int](),
+            Array[Int](),
+          ),
+        )
 
         val dfs = edges.depthFirstSearchToArray(0).toList
         assert(dfs == List(0, 1, 2, 3, 4))
       }
 
       "undirected cycle (diamond) - sink first" in {
-        val edges = NestedArrayInt(Array(
-          /* 0 -> */ Array(1, 2),
-          /* 1 -> */ Array(2),
-          /* 2 -> */ Array[Int]()
-        ))
+        val edges = NestedArrayInt(
+          Array(
+            /* 0 -> */ Array(1, 2),
+            /* 1 -> */ Array(2),
+            /* 2 -> */ Array[Int](),
+          ),
+        )
 
         val dfs = edges.depthFirstSearchToArray(0).toList
         assert(dfs == List(0, 2, 1))
       }
 
       "undirected cycle (diamond) - sink last" in {
-        val edges = NestedArrayInt(Array(
-          /* 0 -> */ Array(2, 1),
-          /* 1 -> */ Array(2),
-          /* 2 -> */ Array[Int]()
-        ))
+        val edges = NestedArrayInt(
+          Array(
+            /* 0 -> */ Array(2, 1),
+            /* 1 -> */ Array(2),
+            /* 2 -> */ Array[Int](),
+          ),
+        )
 
         val dfs = edges.depthFirstSearchToArray(0).toList
         assert(dfs == List(0, 1, 2))
@@ -256,7 +266,7 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
 
       def generateLatticeGraph(size: Int): NestedArrayInt = {
         val n = Math.sqrt(size).floor.toInt
-        NestedArrayInt.apply(Array.tabulate(size){ i =>
+        NestedArrayInt.apply(Array.tabulate(size) { i =>
           Array(i - 1).filter(x => x >= (i / n) * n) ++
             Array(i + 1).filter(x => x <= ((i / n) * n + n - 1) && x < size) ++
             Array(i - n).filter(x => x >= 0) ++
@@ -265,7 +275,7 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
       }
 
       "lattice graph" in {
-        val n = 4
+        val n     = 4
         val edges = generateLatticeGraph(n)
 
         edges.depthFirstSearchToArray(0).toList mustEqual List(0, 2, 3, 1)

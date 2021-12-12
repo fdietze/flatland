@@ -10,22 +10,22 @@ object ArrayQueueInt {
 }
 
 @inline final class ArrayQueueInt private (
-  val capacity: Int,
-  val data: Array[Int],
-  var start: Int = 0,
-  var end: Int = 0, // exclusive
-  var length: Int = 0
+    val capacity: Int,
+    val data: Array[Int],
+    var start: Int = 0,
+    var end: Int = 0, // exclusive
+    var length: Int = 0,
 ) extends immutable.IndexedSeq[Int] {
   @inline override def isEmpty = length == 0
-  @inline def isFull = length == capacity
+  @inline def isFull           = length == capacity
 
-  @inline def first = data(start)
-  @inline def lastIdx = (end - 1 + capacity) % capacity
-  @inline override def last = data(lastIdx)
+  @inline def first                    = data(start)
+  @inline def lastIdx                  = (end - 1 + capacity) % capacity
+  @inline override def last            = data(lastIdx)
   @inline override def apply(idx: Int) = data((start + idx) % capacity)
 
   @inline private def incrementStart(): Unit = start = (start + 1) % capacity
-  @inline private def incrementEnd(): Unit = end = (end + 1) % capacity
+  @inline private def incrementEnd(): Unit   = end = (end + 1) % capacity
 
   @inline def add(elem: Int): Unit = {
     data(end) = elem
