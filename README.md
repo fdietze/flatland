@@ -7,19 +7,23 @@ To know more about the JVM, you should read: https://developer.lightbend.com/blo
 
 ## Dependency
 
-For Scala and ScalaJS:
-```scala
-libraryDependencies += "com.github.fdietze" % "flatland" % "master-SNAPSHOT"
-```
-
-When using [JitPack](https://jitpack.io), it is often more useful to point to a specific commit, to make your builds reproducible:
+With [JitPack](https://jitpack.io), it is common to point to a specific commit to make your builds reproducible:
 
 ```scala
-libraryDependencies += "com.github.fdietze" % "flatland" % "7929c94"
+resolvers += ("jitpack" at "https://jitpack.io")
+libraryDependencies += "com.github.fdietze.flatland" %% "flatland" % "7d78f60"
 
-// instead, for ScalaJS:
-libraryDependencies += "com.github.fdietze.flatland" %%% "flatland" % "7929c94"
+// With ScalaJS:
+libraryDependencies += "com.github.fdietze.flatland" %%% "flatland" % "7d78f60"
 ```
+
+To use it in Ammonite:
+
+```scala
+import $repo.`https://jitpack.io`
+import $ivy.`com.github.fdietze.flatland::flatland:7d78f60`, flatland._
+```
+
 
 ## Examples
 
