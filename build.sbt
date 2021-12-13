@@ -36,7 +36,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform)
   .settings(
     version := "0.1.0",
     libraryDependencies ++=
-      "com.github.fdietze.bench" %%% "bench" % "0efde9b" ::
+      "com.github.fdietze.bench" %%% "bench" % "cb0bd0b" ::
         Nil,
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
