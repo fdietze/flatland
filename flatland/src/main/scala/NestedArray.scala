@@ -20,11 +20,11 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   @inline override def isEmpty: Boolean = length == 0
 
   @inline def sliceDataStart(idx: Int): Int
-  @inline def sliceStart(idx: Int): Int = sliceDataStart(idx) + 1
+  @inline def sliceStart(idx: Int): Int                      = sliceDataStart(idx) + 1
   @inline def sliceLength(idx: Int): Int
-  @inline def sliceEnd(idx: Int): Int = sliceStart(idx) + sliceLength(idx)
-  @inline def sliceIsEmpty(idx: Int): Boolean = sliceLength(idx) == 0
-  @inline def sliceNonEmpty(idx: Int): Boolean = sliceLength(idx) > 0
+  @inline def sliceEnd(idx: Int): Int                        = sliceStart(idx) + sliceLength(idx)
+  @inline def sliceIsEmpty(idx: Int): Boolean                = sliceLength(idx) == 0
+  @inline def sliceNonEmpty(idx: Int): Boolean               = sliceLength(idx) > 0
   @inline protected def dataIndex(idx1: Int, idx2: Int): Int = sliceDataStart(idx1) + idx2 + 1
 
   @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped
@@ -80,10 +80,10 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   @inline def find(idx: Int)(f: Int => Boolean): Option[Int] = {
-    var i = 0
-    val n = sliceLength(idx)
+    var i                   = 0
+    val n                   = sliceLength(idx)
     var result: Option[Int] = None
-    var notFound = true
+    var notFound            = true
     while (notFound && i < n) {
       val elem = apply(idx, i)
       if (f(elem)) {
@@ -97,8 +97,8 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   @inline def indexOf(idx: Int)(elem: Int): Int = {
-    var i = 0
-    val n = sliceLength(idx)
+    var i     = 0
+    val n     = sliceLength(idx)
     var index = -1
     while (index == -1 && i < n) {
       if (apply(idx, i) == elem) {
@@ -115,8 +115,8 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   @inline def whileElement(idx: Int)(f: Int => Boolean): Unit = {
-    var i = 0
-    val n = sliceLength(idx)
+    var i        = 0
+    val n        = sliceLength(idx)
     var notFound = true
     while (notFound && i < n) {
       if (!f(apply(idx, i))) notFound = false
@@ -125,11 +125,11 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   @inline def anyContains(elem: Int): Boolean = {
-    val n = length
+    val n        = length
     var notFound = true
 
     var idx = 0
-    var i = 0
+    var i   = 0
     while (notFound && idx < n) {
       val sliceLen = sliceLength(idx)
       i = 0
@@ -145,8 +145,8 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   @inline def collectFirst[T](idx: Int)(f: PartialFunction[Int, T]): Option[T] = {
-    var i = 0
-    val n = sliceLength(idx)
+    var i                                 = 0
+    val n                                 = sliceLength(idx)
     val safef: PartialFunction[Int, Unit] = f.andThen { t => return Some(t) }
     while (i < n) {
       safef.applyOrElse(apply(idx, i), (_: Int) => ())
@@ -191,25 +191,25 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 
   @inline def flatMap[T: ClassTag](idx: Int)(f: Int => Array[T]): Array[T] = {
     val result = Array.newBuilder[T]
-    foreachElement(idx){ elem =>
+    foreachElement(idx) { elem =>
       result ++= f(elem)
     }
     result.result
   }
 
   @inline def map[T: ClassTag](idx: Int)(f: Int => T): Array[T] = {
-    val n = sliceLength(idx)
+    val n      = sliceLength(idx)
     val result = new Array[T](n)
-    foreachIndexAndElement(idx){ (i, elem) =>
+    foreachIndexAndElement(idx) { (i, elem) =>
       result(i) = f(elem)
     }
     result
   }
 
   @inline def collect[T: ClassTag](idx: Int)(f: PartialFunction[Int, T]): Array[T] = {
-    val result = Array.newBuilder[T]
+    val result                            = Array.newBuilder[T]
     val safef: PartialFunction[Int, Unit] = f.andThen { t => result += t }
-    foreachIndexAndElement(idx){ (i, elem) =>
+    foreachIndexAndElement(idx) { (i, elem) =>
       safef.applyOrElse(elem, (_: Int) => ())
     }
     result.result
@@ -222,8 +222,8 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   }
 
   def transposed: NestedArrayInt = {
-    val counts = new Array[Int](length)
-    loop(length){ idx =>
+    val counts  = new Array[Int](length)
+    loop(length) { idx =>
       loop(sliceLength(idx)) { i =>
         counts(apply(idx, i)) += 1
       }
@@ -241,27 +241,27 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     val builder = new mutable.ArrayBuilder.ofInt
     depthFirstSearchGeneric(
       init = (stack, _) => stack.push(start),
-      processVertex = builder += _
+      processVertex = builder += _,
     )
     builder.result()
   }
 
   // inlining workarounds:
   // (https://github.com/scala-js/scala-js/issues/3624)
-  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean =
+  @inline private def loopConditionGuardDefault: (() => Boolean) => Boolean                   =
     condition => condition()
   @inline private def advanceGuardDefault[PROCESSRESULT]: (PROCESSRESULT, () => Unit) => Unit =
     (result: PROCESSRESULT, advance: () => Unit) => advance()
-  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit =
+  @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit                          =
     (elem, enqueue) => enqueue()
 
   // inline is important for inlining the lambda parameters
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
-    init: (ArrayStackInt, ArraySet) => Unit,
-    processVertex: Int => PROCESSRESULT,
-    loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
-    advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
-    enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault
+      init: (ArrayStackInt, ArraySet) => Unit,
+      processVertex: Int => PROCESSRESULT,
+      loopConditionGuard: (() => Boolean) => Boolean = loopConditionGuardDefault,
+      advanceGuard: (PROCESSRESULT, () => Unit) => Unit = advanceGuardDefault,
+      enqueueGuard: (Int, () => Unit) => Unit = enqueueGuardDefault,
   ): Unit = {
     flatland.depthFirstSearchGeneric(
       vertexCount = length,
@@ -270,7 +270,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
       processVertex,
       loopConditionGuard,
       advanceGuard,
-      enqueueGuard = enqueueGuard
+      enqueueGuard = enqueueGuard,
     )
   }
 }
@@ -278,9 +278,9 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 @inline final class NestedArrayIntValues(val data: Array[Int]) extends NestedArrayInt {
   @inline def length: Int = data(0) // == data(data.length - 1)
 
-  @inline def sliceDataStart(idx: Int): Int = data(idx)
-  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
-  @inline def apply(idx: Int): ArraySliceInt = ArraySliceInt(data, sliceStart(idx), sliceLength(idx))
+  @inline def sliceDataStart(idx: Int): Int    = data(idx)
+  @inline def sliceLength(idx: Int): Int       = data(sliceDataStart(idx))
+  @inline def apply(idx: Int): ArraySliceInt   = ArraySliceInt(data, sliceStart(idx), sliceLength(idx))
   @inline def apply(idx1: Int, idx2: Int): Int = data(dataIndex(idx1, idx2))
 
   @inline def update(idx1: Int, idx2: Int, newValue: Int): Unit = data(dataIndex(idx1, idx2)) = newValue
@@ -288,34 +288,46 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped = new NestedArrayIntMapped(data, f)
 
   def changedWithAssertions(
-    addIdx: Int = 0,
-    addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
-    delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
+      addIdx: Int = 0,
+      addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
+      delElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> position]
   ): NestedArrayIntValues = {
-    assert(addElem.forall{ case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
+    assert(addElem.forall { case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
     assert(addElem.sortBy(_._1).iterator.sameElements(addElem.iterator), "addElem not sorted by idx")
 
-    assert(delElem.map(_._1).sorted.iterator.sameElements(delElem.map(_._1).iterator), s"delElem: not sorted by idx: ${delElem.toList}")
-    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.sorted.iterator.sameElements(grouped._2.iterator)), s"delElem: positions not sorted: ${delElem.groupBy(_._1)}")
-    assert(delElem.groupBy(_._1).forall( grouped => grouped._2.distinct.size == grouped._2.size), s"delElem: positions contains duplicates: ${delElem.groupBy(_._1)}")
-    assert(delElem.forall{case (idx, pos) => pos < sliceLength(idx)}, s"delElem: positon out of bounds: ${delElem.toList}")
+    assert(
+      delElem.map(_._1).sorted.iterator.sameElements(delElem.map(_._1).iterator),
+      s"delElem: not sorted by idx: ${delElem.toList}",
+    )
+    assert(
+      delElem.groupBy(_._1).forall(grouped => grouped._2.sorted.iterator.sameElements(grouped._2.iterator)),
+      s"delElem: positions not sorted: ${delElem.groupBy(_._1)}",
+    )
+    assert(
+      delElem.groupBy(_._1).forall(grouped => grouped._2.distinct.size == grouped._2.size),
+      s"delElem: positions contains duplicates: ${delElem.groupBy(_._1)}",
+    )
+    assert(
+      delElem.forall { case (idx, pos) => pos < sliceLength(idx) },
+      s"delElem: positon out of bounds: ${delElem.toList}",
+    )
 
     changed(addIdx, addElem, delElem)
   }
 
   def changed(
-    addIdx: Int = 0,
-    addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
-    delElem: InterleavedArrayInt = InterleavedArrayInt.empty // Array[idx -> position]
+      addIdx: Int = 0,
+      addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
+      delElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> position]
   ): NestedArrayIntValues = {
     // IMPORTANT:
     // For the operations to be efficient, changed() assumes all assertions from changedSafe.
 
     // def debug(arr: Array[Int]) = {
-      // val length = arr(arr.length - 1)
-      // print(arr.take(length).map(x => f"$x%03d".replace("9999999", "___")).mkString("  ") + "| ")
-      // print(arr.drop(length).dropRight(1).map(x => f"$x%03d".replace("9999999", "___")).mkString("  "))
-      // println(f" |$length%03d")
+    // val length = arr(arr.length - 1)
+    // print(arr.take(length).map(x => f"$x%03d".replace("9999999", "___")).mkString("  ") + "| ")
+    // print(arr.drop(length).dropRight(1).map(x => f"$x%03d".replace("9999999", "___")).mkString("  "))
+    // println(f" |$length%03d")
     // }
 
     @inline def prev = this
@@ -325,7 +337,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     val nextDataSize = prev.data.length + (addIdx * 2) + addElem.length - delElem.length
     // println(Array.tabulate(data.length max nextDataSize)(i => f"$i%03d").mkString(".."))
     // println("-" * 80)
-    val nextData = new Array[Int](nextDataSize)
+    val nextData     = new Array[Int](nextDataSize)
     // val nextData = new {
     //   // FOR DEBUGGING ONLY
     //   val arr = Array.fill(nextDataSize)(9999999)
@@ -343,7 +355,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     //     arr.update(i,elem)
     //   }
     // }
-    val next = new NestedArrayIntValues(nextData)
+    val next         = new NestedArrayIntValues(nextData)
 
     // set the number of slices
     val sliceCount = prev.length + addIdx
@@ -352,10 +364,10 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     // debug(nextData.arr)
 
     // println("recalculate slice starts and lengths (using addElem, delElem)")
-    val addElemLength = addElem.length
-    val delElemLength = delElem.length
-    var addElemIdx = 0
-    var delElemIdx = 0
+    val addElemLength     = addElem.length
+    val delElemLength     = delElem.length
+    var addElemIdx        = 0
+    var delElemIdx        = 0
     var sliceDataStartPos = prev.length + addIdx
     loop(prev.length) { idx =>
       nextData(idx) = sliceDataStartPos
@@ -364,10 +376,10 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
       // println(s"\n  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
       var copySourcePos = prev.sliceStart(idx)
       var copyTargetPos = sliceDataStartPos + 1 // pos after the length field
-      while(delElemIdx < delElemLength && delElem.a(delElemIdx) == idx) {
+      while (delElemIdx < delElemLength && delElem.a(delElemIdx) == idx) {
         val delPos = prev.sliceStart(idx) + delElem.b(delElemIdx)
         // println(s"    copy elements $copySourcePos -> $copyTargetPos until next deleted position $delPos")
-        while(copySourcePos < delPos) {
+        while (copySourcePos < delPos) {
           // println(s"    copyTargetPos: $copyTargetPos value: ${prev.data(copySourcePos)}")
           nextData(copyTargetPos) = prev.data(copySourcePos)
           copyTargetPos += 1
@@ -376,14 +388,13 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
         copySourcePos += 1 // skip deleted element
         // debug(nextData.arr)
 
-
         sliceLength -= 1
         delElemIdx += 1
         // println(s"  idx: $idx (addElemIdx: $addElemIdx, delElemIdx: $delElemIdx)")
       }
       // println(s"    copy remaining elements $copySourcePos -> $copyTargetPos after deleted positions")
-      val sliceEnd = prev.sliceStart(idx) + prev.sliceLength(idx)
-      while(copySourcePos < sliceEnd) {
+      val sliceEnd      = prev.sliceStart(idx) + prev.sliceLength(idx)
+      while (copySourcePos < sliceEnd) {
         nextData(copyTargetPos) = prev.data(copySourcePos)
         copyTargetPos += 1
         copySourcePos += 1
@@ -391,7 +402,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
       // debug(nextData.arr)
 
       // println(s"    add new elements to slice at $copyTargetPos")
-      while(addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
+      while (addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
         nextData(copyTargetPos) = addElem.b(addElemIdx)
         copyTargetPos += 1
         sliceLength += 1
@@ -405,18 +416,17 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 
       // now copy old slice data and skip deleted elements
 
-
       sliceDataStartPos += (1 + sliceLength)
-      // debug(nextData.arr)
+    // debug(nextData.arr)
     }
 
     // println("calculate slice starts and lengths for added Idx")
     loop(sliceCount, start = prev.length) { idx => // idx covers all elements in addIdx
       nextData(idx) = sliceDataStartPos
-      var sliceLength = 0 // adding a fresh slice == insertion pos for added elements
-      var copyTargetPos = sliceDataStartPos+1 // pos after the length field
+      var sliceLength   = 0                     // adding a fresh slice == insertion pos for added elements
+      var copyTargetPos = sliceDataStartPos + 1 // pos after the length field
       // println(s"write added elements into new slices at $copyTargetPos")
-      while(addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
+      while (addElemIdx < addElemLength && addElem.a(addElemIdx) == idx) {
         nextData(copyTargetPos) = addElem.b(addElemIdx)
         copyTargetPos += 1
         sliceLength += 1
@@ -430,7 +440,6 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     }
     // debug(nextData.arr)
 
-
     // println()
     // println(s"reads: ${nextData.reads}, writes: ${nextData.writes} / ${nextData.length}")
     // debug(nextData.arr)
@@ -442,9 +451,9 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 @inline final class NestedArrayIntMapped(data: Array[Int], mapped: Int => Int) extends NestedArrayInt {
   @inline def length: Int = data(0) // == data(data.length - 1)
 
-  @inline def sliceDataStart(idx: Int): Int = data(idx)
-  @inline def sliceLength(idx: Int): Int = data(sliceDataStart(idx))
-  @inline def apply(idx: Int): ArraySliceInt = new ArraySliceIntMapped(data, sliceStart(idx), sliceLength(idx), mapped)
+  @inline def sliceDataStart(idx: Int): Int    = data(idx)
+  @inline def sliceLength(idx: Int): Int       = data(sliceDataStart(idx))
+  @inline def apply(idx: Int): ArraySliceInt   = new ArraySliceIntMapped(data, sliceStart(idx), sliceLength(idx), mapped)
   @inline def apply(idx1: Int, idx2: Int): Int = mapped(data(dataIndex(idx1, idx2)))
 
   @inline def viewMapInt(f: Int => Int): NestedArrayIntMapped = new NestedArrayIntMapped(data, i => f(mapped(i)))
@@ -469,17 +478,17 @@ object NestedArrayInt {
   @inline def empty = new NestedArrayIntValues(data = Array(0))
 
   def apply(nested: Array[Array[Int]]): NestedArrayIntValues = {
-    val n = nested.length
+    val n            = nested.length
     var currentStart = n
     nested.foreachElement { slice =>
       currentStart += (1 + slice.length)
     }
 
     val dataLength = currentStart + 1 // 1 is for number of nested arrays
-    val data = new Array[Int](dataLength)
+    val data       = new Array[Int](dataLength)
     currentStart = n
     nested.foreachIndexAndElement { (i, slice) =>
-      val start = currentStart
+      val start       = currentStart
       val sliceLength = slice.length
       data(i) = start
       data(start) = sliceLength
@@ -493,9 +502,9 @@ object NestedArrayInt {
 
   def apply(builders: Array[mutable.ArrayBuilder.ofInt]): NestedArrayIntValues = {
     // ArrayBuilders can also be null to represent an empty builder
-    val n = builders.length
+    val n            = builders.length
     var currentStart = n
-    val arrays = new Array[Array[Int]](n)
+    val arrays       = new Array[Array[Int]](n)
     builders.foreachIndexAndElement { (i, builder) =>
       val array = if (builder == null) null else builder.result()
       arrays(i) = array
@@ -503,12 +512,12 @@ object NestedArrayInt {
     }
 
     val dataLength = currentStart + 1 // 1 is for number of builders arrays
-    val data = new Array[Int](dataLength)
+    val data       = new Array[Int](dataLength)
     currentStart = n
     builders.foreachIndex { i =>
-      val slice = arrays(i)
+      val slice       = arrays(i)
       val sliceLength = if (slice == null) 0 else slice.length
-      val start = currentStart
+      val start       = currentStart
       data(i) = start
       data(start) = sliceLength
       if (slice != null) slice.copyToArray(data, start + 1)
@@ -520,14 +529,14 @@ object NestedArrayInt {
   }
 
   def apply(sliceLengths: Array[Int]): NestedArrayIntValues = {
-    val n = sliceLengths.length
+    val n            = sliceLengths.length
     var currentStart = n
     sliceLengths.foreachElement { sliceLength =>
       currentStart += (sliceLength + 1)
     }
 
     val dataLength = currentStart + 1 // 1 is for number of nested arrays
-    val data = new Array[Int](dataLength)
+    val data       = new Array[Int](dataLength)
     currentStart = n
 
     sliceLengths.foreachIndexAndElement { (i, sliceLength) =>
