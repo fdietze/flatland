@@ -22,22 +22,26 @@ trait ArraySliceInt extends immutable.IndexedSeq[Int] {
 }
 
 @inline final class ArraySliceIntValues(array: Array[Int], start: Int, val length: Int) extends ArraySliceInt {
-  @inline override def apply(idx: Int): Int = array(start + idx)
-  @inline override def slice(from: Int, until: Int): ArraySliceInt = new ArraySliceIntValues(array, start + from, until - from)
-  @inline override def iterator: Iterator[Int] = array.iterator.slice(start, start + length)
-  @inline def viewMapInt(f: Int => Int): ArraySliceInt = new ArraySliceIntMapped(array, start, length, f)
+  @inline override def apply(idx: Int): Int                        = array(start + idx)
+  @inline override def slice(from: Int, until: Int): ArraySliceInt =
+    new ArraySliceIntValues(array, start + from, until - from)
+  @inline override def iterator: Iterator[Int]                     = array.iterator.slice(start, start + length)
+  @inline def viewMapInt(f: Int => Int): ArraySliceInt             = new ArraySliceIntMapped(array, start, length, f)
   // @inline override def update(idx: Int, elem: Int): Unit = array.update(start + idx, elem)
 }
 
-@inline final class ArraySliceIntMapped(array: Array[Int], start: Int, val length: Int, mapped: Int => Int) extends ArraySliceInt {
-  @inline override def apply(idx: Int): Int = mapped(array(start + idx))
-  @inline override def slice(from: Int, until: Int): ArraySliceInt = new ArraySliceIntMapped(array, start + from, until - from, mapped)
-  @inline override def iterator: Iterator[Int] = array.iterator.slice(start, start + length).map(mapped)
-  @inline def viewMapInt(f: Int => Int): ArraySliceInt = new ArraySliceIntMapped(array, start, length, i => f(mapped(i)))
+@inline final class ArraySliceIntMapped(array: Array[Int], start: Int, val length: Int, mapped: Int => Int)
+    extends ArraySliceInt {
+  @inline override def apply(idx: Int): Int                        = mapped(array(start + idx))
+  @inline override def slice(from: Int, until: Int): ArraySliceInt =
+    new ArraySliceIntMapped(array, start + from, until - from, mapped)
+  @inline override def iterator: Iterator[Int]                     = array.iterator.slice(start, start + length).map(mapped)
+  @inline def viewMapInt(f: Int => Int): ArraySliceInt             =
+    new ArraySliceIntMapped(array, start, length, i => f(mapped(i)))
 }
 
 object ArraySliceInt {
-  @inline def empty = new ArraySliceIntValues(Array.empty, 0, 0)
+  @inline def empty                                             = new ArraySliceIntValues(Array.empty, 0, 0)
   @inline def apply(array: Array[Int], start: Int, length: Int) = new ArraySliceIntValues(array, start, length)
-  @inline def fromArray(array: Array[Int]): ArraySliceInt = apply(array, 0, array.length)
+  @inline def fromArray(array: Array[Int]): ArraySliceInt       = apply(array, 0, array.length)
 }

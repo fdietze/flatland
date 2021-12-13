@@ -26,7 +26,9 @@ class ArraySpec extends AnyFreeSpec with Matchers {
     }
     "array" in {
       val buffer = Array("a", "b", "meh", "c")
-      buffer.flatMapWithIndex[String]((idx, str) => if (str.length ==1) Array(idx + str) else Array.empty) mustEqual Array("0a", "1b", "3c")
+      buffer.flatMapWithIndex[String]((idx, str) =>
+        if (str.length == 1) Array(idx + str) else Array.empty,
+      ) mustEqual Array("0a", "1b", "3c")
     }
   }
 }

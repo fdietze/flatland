@@ -8,9 +8,9 @@ object ArrayStackInt {
   @inline private def incrementTop(): Unit = top += 1
   @inline private def decrementTop(): Unit = top -= 1
 
-  @inline def size = top
+  @inline def size    = top
   @inline def isEmpty = top == 0
-  @inline def isFull = top == stack.length
+  @inline def isFull  = top == stack.length
 
   @inline def push(value: Int) = {
     stack(top) = value
