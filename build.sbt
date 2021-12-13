@@ -1,7 +1,7 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val sharedSettings = Seq(
-  crossScalaVersions := Seq("2.12.15", "2.13.7"),
+  crossScalaVersions := Seq("2.12.15", "2.13.7", "3.1.0"),
   scalaVersion := crossScalaVersions.value.last,
   resolvers ++=
     ("jitpack" at "https://jitpack.io") ::
@@ -36,7 +36,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform)
   .settings(
     version := "0.1.0",
     libraryDependencies ++=
-      "com.github.fdietze.bench" %%% "bench" % "cb0bd0b" ::
+      "com.github.fdietze.bench" %%% "bench" % "ed4b6ed" ::
         Nil,
     scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
