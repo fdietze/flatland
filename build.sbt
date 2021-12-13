@@ -27,6 +27,7 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform)
     console / initialCommands := """
       import flatland._
       """,
+      Compile/packageDoc/publishArtifact := false, // disable publishing docs, because of a crash
   )
 
 lazy val bench = crossProject(JSPlatform, JVMPlatform)
@@ -34,7 +35,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform)
   .settings(sharedSettings)
   .dependsOn(flatland)
   .settings(
-    version := "0.1.0",
+    publish/skip := true,
     libraryDependencies ++=
       "com.github.fdietze.bench" %%% "bench" % "ed4b6ed" ::
         Nil,
