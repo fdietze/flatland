@@ -74,7 +74,7 @@ object ArraySet {
       builder += f(i)
     }
 
-    builder.result
+    builder.result()
   }
 
   @inline def collectAllElements: Array[Int] = {

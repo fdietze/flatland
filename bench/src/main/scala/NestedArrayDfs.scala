@@ -42,7 +42,7 @@ object NestedArrayDfs {
         edgeIdx += 1
       }
     }
-    val edges                   = InterleavedArrayInt(edgesBuilder.result)
+    val edges                   = InterleavedArrayInt(edgesBuilder.result())
     val incidenceLookup         = NestedArrayInt(incidenceBuilder)
     val indirectIncidenceLookup = incidenceLookup.viewMapInt(edgeIdx => edges.right(edgeIdx))
 

@@ -194,7 +194,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     foreachElement(idx) { elem =>
       result ++= f(elem)
     }
-    result.result
+    result.result()
   }
 
   @inline def map[T: ClassTag](idx: Int)(f: Int => T): Array[T] = {
@@ -212,7 +212,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
     foreachIndexAndElement(idx) { (i, elem) =>
       safef.applyOrElse(elem, (_: Int) => ())
     }
-    result.result
+    result.result()
   }
 
   @inline def toArraySet(idx: Int): ArraySet = {
@@ -253,7 +253,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
   @inline private def advanceGuardDefault[PROCESSRESULT]: (PROCESSRESULT, () => Unit) => Unit =
     (result: PROCESSRESULT, advance: () => Unit) => advance()
   @inline private def enqueueGuardDefault: (Int, () => Unit) => Unit                          =
-    (elem, enqueue) => enqueue()
+    (_, enqueue) => enqueue()
 
   // inline is important for inlining the lambda parameters
   @inline def depthFirstSearchGeneric[PROCESSRESULT](
@@ -292,7 +292,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
       addElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> elem]
       delElem: InterleavedArrayInt = InterleavedArrayInt.empty, // Array[idx -> position]
   ): NestedArrayIntValues = {
-    assert(addElem.forall { case (idx, elem) => idx < (length + addIdx) }, "addElem: invalid index")
+    assert(addElem.forall { case (idx, _) => idx < (length + addIdx) }, "addElem: invalid index")
     assert(addElem.sortBy(_._1).iterator.sameElements(addElem.iterator), "addElem not sorted by idx")
 
     assert(
