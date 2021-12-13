@@ -63,7 +63,7 @@ class NestedArraySpec extends AnyFreeSpec with Matchers {
         b ++= elems
         b
       }
-      val nested = NestedArrayInt(Array(builder(3), builder(), builder(0), null, builder(0, 1)))
+      val nested               = NestedArrayInt(Array(builder(3), builder(), builder(0), null, builder(0, 1)))
       nested.length mustEqual 5
       nested(0).toList mustEqual List(3)
       nested(1).toList mustEqual List()

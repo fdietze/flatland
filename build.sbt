@@ -1,8 +1,8 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val sharedSettings = Seq(
-  crossScalaVersions := Seq("2.12.15", "2.13.7", "3.1.0"),
-  scalaVersion := crossScalaVersions.value.last,
+  crossScalaVersions                              := Seq("2.12.15", "2.13.7", "3.1.0"),
+  scalaVersion                                    := crossScalaVersions.value.last,
   resolvers ++=
     ("jitpack" at "https://jitpack.io") ::
       Nil,
@@ -14,20 +14,20 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(sharedSettings)
   .settings(
-    organization := "com.github.fdietze",
-    name := "flatland",
-    version := "master-SNAPSHOT",
+    organization                           := "com.github.fdietze",
+    name                                   := "flatland",
+    version                                := "master-SNAPSHOT",
     libraryDependencies ++= (
-      "org.scalatest"       %%% "scalatest"       % "3.2.10"   % Test ::
-        "org.scalatestplus" %%% "scalacheck-1-15" % "3.2.10.0" % Test ::
-        "org.scalacheck"    %%% "scalacheck"      % "1.15.4"   % Test ::
+      "org.scalatest"                     %%% "scalatest"       % "3.2.10"   % Test ::
+        "org.scalatestplus"               %%% "scalacheck-1-15" % "3.2.10.0" % Test ::
+        "org.scalacheck"                  %%% "scalacheck"      % "1.15.4"   % Test ::
         Nil
     ),
-    Test / scalaJSStage := FullOptStage,
-    console / initialCommands := """
+    Test / scalaJSStage                    := FullOptStage,
+    console / initialCommands              := """
       import flatland._
       """,
-      Compile/packageDoc/publishArtifact := false, // disable publishing docs, because of a crash
+    Compile / packageDoc / publishArtifact := false, // disable publishing docs, because of a crash
   )
 
 lazy val bench = crossProject(JSPlatform, JVMPlatform)
@@ -35,7 +35,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform)
   .settings(sharedSettings)
   .dependsOn(flatland)
   .settings(
-    publish/skip := true,
+    publish / skip                := true,
     libraryDependencies ++=
       "com.github.fdietze.bench" %%% "bench" % "ed4b6ed" ::
         Nil,
@@ -60,7 +60,7 @@ lazy val bench = crossProject(JSPlatform, JVMPlatform)
     },
   )
   .jsSettings(
-    Compile / scalaJSStage := FullOptStage,
+    Compile / scalaJSStage          := FullOptStage,
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule)),
   )

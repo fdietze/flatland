@@ -31,7 +31,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 
   @inline def apply(idx: Int): ArraySliceInt
   @inline def apply(idx1: Int, idx2: Int): Int
-  @inline def safe(idx: Int): ArraySliceInt = {
+  @inline def safe(idx: Int): ArraySliceInt          = {
     if (idx < 0 || length <= idx) ArraySliceInt.empty
     else apply(idx)
   }
@@ -436,7 +436,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 
       nextData(sliceDataStartPos) = sliceLength
       sliceDataStartPos += (1 + sliceLength)
-      // debug(nextData.arr)
+    // debug(nextData.arr)
     }
     // debug(nextData.arr)
 
@@ -460,7 +460,7 @@ trait NestedArrayInt extends IndexedSeq[ArraySliceInt] {
 }
 
 @inline final class NestedArrayIntBuilder(nestedArray: NestedArrayIntValues) {
-  var filled = new Array[Int](nestedArray.length)
+  var filled                          = new Array[Int](nestedArray.length)
   def add(idx: Int, value: Int): Unit = {
     // assert(idx < nestedArray.length)
     // assert(filled(idx) < nestedArray.sliceLength(idx), idx)
@@ -551,6 +551,6 @@ object NestedArrayInt {
   }
 
   @inline def builder(sliceLengths: Array[Int]): NestedArrayIntBuilder = {
-    new NestedArrayIntBuilder(apply(sliceLengths)) //, sliceLengths)
+    new NestedArrayIntBuilder(apply(sliceLengths)) // , sliceLengths)
   }
 }

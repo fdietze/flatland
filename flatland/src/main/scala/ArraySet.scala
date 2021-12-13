@@ -8,7 +8,7 @@ object ArraySet {
 }
 
 @inline final class ArraySet(val marked: Array[Int]) extends AnyVal {
-  //TODO: track number of added nodes to speed up map and allElements
+  // TODO: track number of added nodes to speed up map and allElements
   @inline def add(elem: Int): Unit                 = marked(elem) = 1
   @inline def add(elems: IndexedSeq[Int]): Unit    = elems.foreachElement(add)
   @inline def remove(elem: Int): Unit              = marked(elem) = 0
@@ -42,7 +42,7 @@ object ArraySet {
     }
   }
 
-  @inline def calculateIsEmpty: Boolean = {
+  @inline def calculateIsEmpty: Boolean  = {
     foreach { _ => return false }
     true
   }

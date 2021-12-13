@@ -16,7 +16,7 @@ object ArrayStackInt {
     stack(top) = value
     incrementTop()
   }
-  @inline def pop() = {
+  @inline def pop()            = {
     decrementTop()
     stack(top)
   }

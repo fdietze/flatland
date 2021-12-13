@@ -37,7 +37,7 @@ object ArrayQueueInt {
       incrementStart()
     }
   }
-  @inline def +=(elem: Int) = add(elem)
+  @inline def +=(elem: Int)        = add(elem)
 
   @inline def popBack(): Int = {
     val elem = first

@@ -179,7 +179,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
                } yield delElem
   } yield NestedWithChanges(nested, addIdx, addElem, delElem)
 
-  ////
+  // //
   assert(
     removeLastElemFromAddIdx(
       NestedWithChanges(Vector(), 3, Vector(1 -> 5, 2 -> 3)),
@@ -190,7 +190,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
     ),
   )
 
-  ////
+  // //
   assert(
     removeLastElemFromAddIdx(
       NestedWithChanges(Vector(), 1, Vector(0 -> 5)),
@@ -201,7 +201,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
     ),
   )
 
-  ////
+  // //
   assert(
     removeOneElementFromAddElem(
       NestedWithChanges(Vector(), 3, Vector(1 -> 5, 2 -> 3)),
@@ -216,7 +216,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
       NestedWithChanges(Vector(), 3, Vector()),
   )
 
-  ////
+  // //
   assert(
     shrinkValueInAddElem(
       NestedWithChanges(Vector(), 3, Vector(1 -> 5, 2 -> 3)),
@@ -224,7 +224,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
       NestedWithChanges(Vector(), 3, Vector(1 -> implicitly[Shrink[Int]].shrink(5).head, 2 -> 3)),
   )
 
-  ////
+  // //
   assert(
     shrinkValueInNested(
       NestedWithChanges(Vector(Vector(17)), 2, Vector(1 -> 5, 2 -> 3)),
@@ -246,7 +246,7 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
       NestedWithChanges(Vector(), 0, Vector()),
   )
 
-  ////
+  // //
   assert(
     removeInnerElemFromNested(
       NestedWithChanges(
@@ -293,13 +293,13 @@ class NestedArrayChangePropertySpec extends AnyFreeSpec with Checkers {
         }
         result
       }
-      val original = NestedArrayInt(nested)
-      val result   = original.changedWithAssertions(
+      val original     = NestedArrayInt(nested)
+      val result       = original.changedWithAssertions(
         addIdx,
         InterleavedArrayInt(addElem),
         InterleavedArrayInt(delElem),
       )
-      val expected = NestedArrayInt(changedArray.toArray)
+      val expected     = NestedArrayInt(changedArray.toArray)
 
       result.data.sameElements(expected.data)
     },

@@ -48,7 +48,7 @@ class NestedArrayChangeSpec extends AnyFreeSpec with Matchers {
     "add idx with elem to empty" in {
       val nested = NestedArrayInt.empty
 
-      val patched = nested.changedWithAssertions(
+      val patched  = nested.changedWithAssertions(
         addIdx = 1,
         addElem = InterleavedArrayInt((0, 22)), // already exists
       )
