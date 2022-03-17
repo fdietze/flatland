@@ -1,6 +1,6 @@
 package flatland
 
-import scala.collection.immutable
+import scala.collection.mutable
 
 object ArrayQueueLong {
   @inline def create(capacity: Int) = {
@@ -15,14 +15,15 @@ object ArrayQueueLong {
     var start: Int = 0,
     var end: Int = 0, // exclusive
     var length: Int = 0,
-) extends immutable.IndexedSeq[Long] {
+) extends mutable.IndexedSeq[Long] {
   @inline override def isEmpty = length == 0
   @inline def isFull           = length == capacity
 
-  @inline def first                    = data(start)
-  @inline def lastIdx                  = (end - 1 + capacity) % capacity
-  @inline override def last            = data(lastIdx)
-  @inline override def apply(idx: Int) = data((start + idx) % capacity)
+  @inline def first                                 = data(start)
+  @inline def lastIdx                               = (end - 1 + capacity) % capacity
+  @inline override def last                         = data(lastIdx)
+  @inline override def apply(idx: Int)              = data((start + idx) % capacity)
+  @inline override def update(idx: Int, elem: Long) = data((start + idx) % capacity) = elem
 
   @inline private def incrementStart(): Unit = start = (start + 1) % capacity
   @inline private def incrementEnd(): Unit   = end = (end + 1) % capacity
