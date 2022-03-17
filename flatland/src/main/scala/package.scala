@@ -30,7 +30,7 @@ package object flatland {
     all
   }
 
-  implicit final class RichIndexedSeq[T](val self: IndexedSeq[T]) extends AnyVal {
+  implicit final class RichIndexedSeq[T](val self: collection.IndexedSeq[T]) extends AnyVal {
     @inline def minMax(smallerThan: (T, T) => Boolean): (T, T) = {
       if (self.isEmpty) throw new UnsupportedOperationException("minMax on empty sequence")
 
@@ -101,7 +101,7 @@ package object flatland {
     }
   }
 
-  implicit final class RichSeq[T](val self: Seq[T]) extends AnyVal {
+  implicit final class RichSeq[T](val self: collection.Seq[T]) extends AnyVal {
     @inline def foreachIndexAndElement(f: (Int, T) => Unit): Unit = {
       val n = self.length
       var i = 0
