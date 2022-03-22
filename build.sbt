@@ -6,7 +6,7 @@ val sharedSettings = Seq(
   resolvers ++=
     ("jitpack" at "https://jitpack.io") ::
       Nil,
-  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0",
+  libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
   scalacOptions --= Seq("-Xfatal-warnings"), // overwrite sbt-tpolecat setting
 )
 
