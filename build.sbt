@@ -20,7 +20,7 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= (
       "org.scalatest"                     %%% "scalatest"       % "3.2.13"   % Test ::
         "org.scalatestplus"               %%% "scalacheck-1-15" % "3.2.11.0" % Test ::
-        "org.scalacheck"                  %%% "scalacheck"      % "1.16.0"   % Test ::
+        "org.scalacheck"                  %%% "scalacheck"      % "1.17.0"   % Test ::
         Nil
     ),
     Test / scalaJSStage                    := FullOptStage,
