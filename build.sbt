@@ -1,7 +1,7 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val sharedSettings = Seq(
-  crossScalaVersions                              := Seq("2.12.16", "2.13.8", "3.1.3"),
+  crossScalaVersions                              := Seq("2.12.17", "2.13.8", "3.1.3"),
   scalaVersion                                    := crossScalaVersions.value.last,
   resolvers ++=
     ("jitpack" at "https://jitpack.io") ::
@@ -18,9 +18,9 @@ lazy val flatland = crossProject(JSPlatform, JVMPlatform)
     name                                   := "flatland",
     version                                := "master-SNAPSHOT",
     libraryDependencies ++= (
-      "org.scalatest"                     %%% "scalatest"       % "3.2.13"   % Test ::
+      "org.scalatest"                     %%% "scalatest"       % "3.2.14"   % Test ::
         "org.scalatestplus"               %%% "scalacheck-1-15" % "3.2.11.0" % Test ::
-        "org.scalacheck"                  %%% "scalacheck"      % "1.16.0"   % Test ::
+        "org.scalacheck"                  %%% "scalacheck"      % "1.17.0"   % Test ::
         Nil
     ),
     Test / scalaJSStage                    := FullOptStage,
