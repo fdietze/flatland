@@ -1,7 +1,7 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 val sharedSettings = Seq(
-  crossScalaVersions                              := Seq("2.12.17", "2.13.8", "3.2.0"),
+  crossScalaVersions                              := Seq("2.12.17", "2.13.8", "3.1.3"),
   scalaVersion                                    := crossScalaVersions.value.last,
   resolvers ++=
     ("jitpack" at "https://jitpack.io") ::
